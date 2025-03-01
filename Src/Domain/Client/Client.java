@@ -1,5 +1,8 @@
 package Src.Domain.Client;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,20 +16,55 @@ import Src.Domain.Server.Message.CompressionManager;
 import Src.Domain.Server.Message.Message;
 import Src.Domain.ServiceOrder.ServiceOrder;
 import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServerData.ServerData;
 
 public class Client implements ClientInterface {
+    private ServerData serverData;
     private ServerInterface server;
+    private Socket serverSocket;
+    private ObjectInputStream input;
+    private ObjectOutputStream output; 
 
     public Client() {
+        this.serverData = new ServerData("localhost", 5000);
+
         this.connectServer();
     }
 
     @Override
     public ServerInterface connectServer() {
-        this.server = new Server();
+        try {
+            // conecta com o servidor de localização e pega o endereço do novo
+            this.serverSocket = new Socket(this.serverData.IP, this.serverData.port);
 
-        return this.server;
+            this.input = new ObjectInputStream(this.serverSocket.getInputStream());
+
+            this.serverData = (ServerData) this.input.readObject();
+
+            this.serverSocket.close();
+
+            System.out.println("tentou criar a nova conexão");
+
+            // descarta a conexão antiga e cria uma nova com o servidor recebido
+            this.serverSocket = new Socket(this.serverData.IP, this.serverData.port);
+
+            this.input = new ObjectInputStream(this.serverSocket.getInputStream());
+            this.output = new ObjectOutputStream(this.serverSocket.getOutputStream());
+
+            this.server = new Server();
+
+            return this.server;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            System.out.println("Erro ao conectar com o servidor");
+
+            return null;
+        }
     }
+
+    // Esses metodos são os antigos ainda, pode modoficar da forma que quiser
+    // Mas me informe depois
 
     @Override
     public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException {
