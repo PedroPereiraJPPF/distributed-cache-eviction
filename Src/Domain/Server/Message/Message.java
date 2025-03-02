@@ -3,10 +3,16 @@ import java.util.Date;
 
 public class Message {
     private String[] values;
+    // as operações terão nomes simples, essa variavel não será codificada.
+    private String operation;
     private CompressedObject codifiedValues;
 
     public Message() {
         this.values = new String[4];
+    }
+
+    public Message(String operation) {
+        this.operation = operation;
     }
 
     public Message(String name, String description) {
@@ -68,5 +74,13 @@ public class Message {
         this.values[3] = requestTime.toString();
 
         this.codifiedValues = CompressionManager.codifyParameter(this.values);
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
+    }
+
+    public String getOperation() {
+        return this.operation;
     }
 }

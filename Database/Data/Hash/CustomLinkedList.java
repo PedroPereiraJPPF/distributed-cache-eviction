@@ -1,6 +1,6 @@
 package Database.Data.Hash;
 
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 
 public class CustomLinkedList {
     private Node head;

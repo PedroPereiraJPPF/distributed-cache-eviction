@@ -14,9 +14,9 @@ import Src.Domain.Server.Interface.ServerInterface;
 import Src.Domain.Server.Message.CompressedObject;
 import Src.Domain.Server.Message.CompressionManager;
 import Src.Domain.Server.Message.Message;
-import Src.Domain.ServiceOrder.ServiceOrder;
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
 import Src.Domain.Structures.ServerData.ServerData;
+import Src.Domain.Structures.ServiceOrder.ServiceOrder;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 
 public class Client implements ClientInterface {
     private ServerData serverData;
@@ -118,14 +118,14 @@ public class Client implements ClientInterface {
     }
 
     @Override
-    public List<ServiceOrderInterface> listServiceOrders() throws ParseException {
+    public List<ServiceOrderInterface> listServiceOrders(Message newMessage) throws ParseException {
         List<ServiceOrderInterface> orders = new ArrayList<>();
 
-        List<Message> messages = this.server.listServiceOrders();
+        // List<Message> messages = this.server.listServiceOrders(newMessage);
 
-        for (Message message : messages) {
-            orders.add(this.messageToServiceOrder(message));
-        }
+        // for (Message message : messages) {
+        //     orders.add(this.messageToServiceOrder(message));
+        // }
 
         return orders;
     }

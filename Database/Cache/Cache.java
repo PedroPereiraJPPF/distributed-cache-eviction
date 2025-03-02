@@ -3,7 +3,7 @@ package Database.Cache;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 import Utils.Logger;
 
 public class Cache {

@@ -2,27 +2,23 @@ package Src.Domain.Server;
 
 import java.util.List;
 import java.util.ArrayList;
-
-import Database.Cache.Hash.HashCache;
 import Database.Data.Hash.HashDatabase;
 import Src.Domain.Server.Interface.ServerInterface;
 import Src.Domain.Server.Message.CompressedObject;
 import Src.Domain.Server.Message.CompressionManager;
 import Src.Domain.Server.Message.Message;
-import Src.Domain.ServiceOrder.ServiceOrder;
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrder;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 import Utils.Logger;
 
 import java.text.ParseException;
 
 public class Server implements ServerInterface {
     private HashDatabase database;
-    private HashCache cache;
     private Logger opLogger = new Logger("Logs/OperationsLogs.log");
 
     public Server() {
         this.database = new HashDatabase();
-        this.cache = new HashCache(30);
 
         for (int i = 1; i <= 70; i++) {
             ServiceOrder serviceOrder = new ServiceOrder();
@@ -74,19 +70,12 @@ public class Server implements ServerInterface {
 
     @Override
     public ServiceOrderInterface getServiceOrder(int code) {
-        ServiceOrderInterface value = this.cache.find(code);
-
-        if (value != null)
-            return value;
+        ServiceOrderInterface value = null;
 
         value = this.database.search(code);
 
         if (value == null) 
             return null;
-
-        this.cache.insert(value);
-
-        this.cache.printElements();
 
         return value;
     }
@@ -130,8 +119,6 @@ public class Server implements ServerInterface {
 
         this.database.delete(code);
 
-        this.cache.printElements();
-
         this.database.printAll();
     }
 
@@ -143,8 +130,6 @@ public class Server implements ServerInterface {
     @Override
     public void deleteServiceOrder(ServiceOrderInterface serviceOrder) {
         this.database.delete(serviceOrder.getCode());
-
-        this.cache.delete(serviceOrder.getCode());
     }
 
     @Override

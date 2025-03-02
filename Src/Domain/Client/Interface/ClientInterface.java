@@ -5,7 +5,7 @@ import java.util.List;
 
 import Src.Domain.Server.Interface.ServerInterface;
 import Src.Domain.Server.Message.Message;
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 
 /**
  * ClientInterface
@@ -17,7 +17,7 @@ public interface ClientInterface {
     public boolean deleteServiceOrder(Message message);
     public ServiceOrderInterface getServiceOrder(Message orderId) throws ParseException;
     public ServiceOrderInterface updateServiceOrder(Message message);
-    public List<ServiceOrderInterface> listServiceOrders() throws ParseException;
+    public List<ServiceOrderInterface> listServiceOrders(Message message) throws ParseException;
     public int countServiceOrders();
     public int[] countOperations();
 }

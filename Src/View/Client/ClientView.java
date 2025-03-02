@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 import Src.Domain.Client.Client;
 import Src.Domain.Server.Message.Message;
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 
 public class ClientView {
     private Client client;
@@ -116,7 +116,7 @@ public class ClientView {
     }
 
     public void storeServiceOrder() throws ParseException {
-        Message message = new Message();
+        Message message = new Message("store");
 
         System.out.println("Digite os detalhes da ordem de serviço:");
 
@@ -136,7 +136,7 @@ public class ClientView {
         int id = scanner.nextInt();
         scanner.nextLine();
 
-        Message message = new Message();
+        Message message = new Message("delete");
         message.setCode(id);
 
         if (id < 0) {
@@ -156,7 +156,7 @@ public class ClientView {
         int id = scanner.nextInt();
         scanner.nextLine();
 
-        Message message = new Message();
+        Message message = new Message("get");
         message.setCode(id);
 
         ServiceOrderInterface serviceOrder = client.getServiceOrder(message);
@@ -168,7 +168,7 @@ public class ClientView {
     }
 
     public void updateServiceOrder() {
-        Message message = new Message();
+        Message message = new Message("update");
 
         System.out.println("Digite os detalhes da ordem de serviço:");
         
@@ -199,7 +199,10 @@ public class ClientView {
     }
 
     public void listServiceOrders() throws ParseException {
-        List<ServiceOrderInterface> orders = client.listServiceOrders();
+        Message message = new Message("getAll");
+
+        List<ServiceOrderInterface> orders = client.listServiceOrders(message);
+
         if (orders.isEmpty()) {
             System.out.println(RED + "Nenhuma ordem de serviço encontrada. " + CROSS + RESET);
         } else {
@@ -211,7 +214,10 @@ public class ClientView {
     }
 
     public void countServiceOrders() throws ParseException {
-        List<ServiceOrderInterface> orders = client.listServiceOrders();
+        Message message = new Message("getAll");
+        
+        List<ServiceOrderInterface> orders = client.listServiceOrders(message);
+
         if (orders.isEmpty()) {
             System.out.println(RED + "Nenhuma ordem de serviço encontrada. " + CROSS + RESET);
         } else {

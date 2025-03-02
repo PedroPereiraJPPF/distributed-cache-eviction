@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.util.List;
 
 import Src.Domain.Server.Message.Message;
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 
 public interface ServerInterface {
     public List<Message> listServiceOrders();

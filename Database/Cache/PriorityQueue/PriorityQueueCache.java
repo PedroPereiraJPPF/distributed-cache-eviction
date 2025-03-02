@@ -1,7 +1,7 @@
 package Database.Cache.PriorityQueue;
 import java.util.ArrayList;
 
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 import Utils.Logger;
 
 public class PriorityQueueCache {

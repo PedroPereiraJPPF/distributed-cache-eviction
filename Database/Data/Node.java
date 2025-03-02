@@ -2,7 +2,7 @@ package Database.Data;
 
 import java.io.Serializable;
 
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 
 public class Node implements Serializable {
     int key;

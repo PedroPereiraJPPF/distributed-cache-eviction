@@ -1,6 +1,6 @@
 package Database.Cache.Hash;
 
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 import Utils.Logger;
 
 public class HashCache {

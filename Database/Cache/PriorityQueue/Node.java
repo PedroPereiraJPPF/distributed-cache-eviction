@@ -1,6 +1,6 @@
 package Database.Cache.PriorityQueue;
 
-import Src.Domain.ServiceOrder.ServiceOrderInterface;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 
 public class Node {
     Integer frequency;

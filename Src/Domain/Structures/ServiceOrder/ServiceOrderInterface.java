@@ -1,4 +1,4 @@
-package Src.Domain.ServiceOrder;
+package Src.Domain.Structures.ServiceOrder;
 
 import java.io.Serializable;
 import java.util.Date;
