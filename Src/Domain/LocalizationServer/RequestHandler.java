@@ -17,7 +17,7 @@ class RequestHandler implements Runnable {
     public RequestHandler(Socket socket, Integer serverPort, String serverIP) {
         this.socket = socket;
         this.loadBalancerData = new ServerData(serverIP, serverPort);
-        this.logger = new Logger("Logs/LocalizationServer.logs");
+        this.logger = new Logger("Logs/LocalizationServer.log");
     }
 
     public void run() {

@@ -45,12 +45,6 @@ public class Client implements ClientInterface {
 
             System.out.println("tentou criar a nova conexão");
 
-            // descarta a conexão antiga e cria uma nova com o servidor recebido
-            this.serverSocket = new Socket(this.serverData.IP, this.serverData.port);
-
-            this.input = new ObjectInputStream(this.serverSocket.getInputStream());
-            this.output = new ObjectOutputStream(this.serverSocket.getOutputStream());
-
             this.server = new Server();
 
             return this.server;
@@ -63,8 +57,25 @@ public class Client implements ClientInterface {
         }
     }
 
-    // Esses metodos são os antigos ainda, pode modoficar da forma que quiser
-    // Mas me informe depois
+    // nesse metodo vou receber os dados e tentar authenticar o usuario
+    // caso a resposta do servidor seja positiva a authenticação foi concluida
+    public boolean authenticate(String userData) {
+        try {
+            // descarta a conexão antiga e cria uma nova com o servidor recebido
+            this.serverSocket = new Socket(this.serverData.IP, this.serverData.port);
+
+            this.input = new ObjectInputStream(this.serverSocket.getInputStream());
+            this.output = new ObjectOutputStream(this.serverSocket.getOutputStream());
+
+            this.output.writeObject(userData);
+
+            String authResponse = (String) this.input.readObject();
+
+            return authResponse.equals("auth:valid");
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     @Override
     public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException {

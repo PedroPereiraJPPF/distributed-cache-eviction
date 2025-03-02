@@ -9,10 +9,10 @@ import Utils.Logger;
 // Irá retornar um objeto do tipo ServerData
 public class LocalizationServer {
     public static void main(String[] args) {
-        final String loadBalancerIP = "localhost";
-        final Integer loadBalancerPort = 5001;
+        final String proxyIP = "localhost";
+        final Integer proxyPort = 5001;
         ServerSocket server = null;
-        Logger logger = new Logger("Logs/LocalizationServer.logs");
+        Logger logger = new Logger("Logs/LocalizationServer.log");
 
         try {
             server = new ServerSocket(5000);
@@ -25,7 +25,7 @@ public class LocalizationServer {
 
                 logger.info("Cliente de ip: " + cliente.getInetAddress().getHostAddress() + " conectou ao servidor de localização");
 
-                new Thread(new RequestHandler(cliente, loadBalancerPort, loadBalancerIP)).start();;
+                new Thread(new RequestHandler(cliente, proxyPort, proxyIP)).start();;
             }
         } catch (IOException e) {
             e.printStackTrace();

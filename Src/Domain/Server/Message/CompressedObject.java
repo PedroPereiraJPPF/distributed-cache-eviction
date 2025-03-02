@@ -1,7 +1,8 @@
 package Src.Domain.Server.Message;
+import java.io.Serializable;
 import java.util.Map;
 
-public class CompressedObject {
+public class CompressedObject implements Serializable {
     private String[] values;
     private Map<Character, Integer> frequencyTable;
 

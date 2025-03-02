@@ -32,7 +32,37 @@ public class ClientView {
     }
 
     public void start() throws ParseException {
+        boolean authenticated = false;
+
+        System.out.println("Para inciar é necessario fazer a authenticação");
         while (true) {
+            System.out.println("Digite 1 para authenticar e 2 para sair");
+            String response = this.scanner.nextLine();
+
+            if (response.equals("2")) {
+                break;
+            }
+
+            System.out.print("Digite seu usuario: ");
+            String user = this.scanner.nextLine();
+
+            System.out.print("Digite sua senha: ");
+            String password = this.scanner.nextLine();
+
+            String userData = user + ":" + password;
+
+            authenticated = this.client.authenticate(userData);
+
+            if (authenticated) {
+                System.out.println("Bem vindo ao sistema");
+                
+                break;
+            }
+
+            System.out.println("A authenticação falhou tente novamente");
+        }
+
+        while (authenticated) {
             try {
                 System.out.println(BLUE + "\n--- Interface do Cliente ---" + RESET);
                 System.out.println(YELLOW + "1. " + ARROW + " Armazenar Ordem de Serviço" + RESET);

@@ -12,6 +12,7 @@ import Src.Domain.ServiceOrder.ServiceOrderInterface;
  */
 public interface ClientInterface {
     public ServerInterface connectServer();
+    public boolean authenticate(String userData);
     public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException;
     public boolean deleteServiceOrder(Message message);
     public ServiceOrderInterface getServiceOrder(Message orderId) throws ParseException;
