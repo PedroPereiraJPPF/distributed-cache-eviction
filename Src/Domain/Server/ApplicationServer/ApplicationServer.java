@@ -1,19 +1,18 @@
 package Src.Domain.Server.ApplicationServer;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import Src.Domain.Server.Server;
 import Utils.Logger;
 
 public class ApplicationServer {
     public static void main(String[] args) {
         Logger logger = new Logger("Logs/AplicationServerLogs.log");
         ServerSocket server;
-        ObjectOutputStream clientOutput;
-        ObjectInputStream inputInput;
+        // Essa classe serve para controlar as operações no banco e descompressão das mensagens
+        Server serverCore = new Server(); 
 
         try {
             server = new ServerSocket(5002);
@@ -22,10 +21,11 @@ public class ApplicationServer {
 
             while(true) {
                 Socket client = server.accept();
+
                 logger.info("Cliente conectado");
                 System.out.println("Cliente conectado");
 
-                new Thread(new RequestHandler(client)).start();
+                new Thread(new RequestHandler(client, serverCore)).start();
             }
 
         } catch (IOException e) {

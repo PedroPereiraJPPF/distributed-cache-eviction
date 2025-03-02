@@ -60,18 +60,26 @@ public class ProxyServer {
 
                         clientOutput.writeObject(new String("auth:invalid"));
 
+                        client.close();
+
                         continue;
                     }
 
                     clientOutput.writeObject(new String("auth:valid"));
 
-                    new Thread(new RequestHandler(applicationServerIp, applicationServerPort, client)).start();
+                    System.out.println("Thread vai iniciar");
+
+                    new Thread(new RequestHandler(applicationServerIp, applicationServerPort, client, clientInput, clientOutput)).start();
+
+                    System.out.println("Thread iniciada");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 
                 logger.error(e.getMessage());
             } catch (Exception e) {
+                e.printStackTrace();
+
                 logger.error(e.getMessage());
 
                 break;

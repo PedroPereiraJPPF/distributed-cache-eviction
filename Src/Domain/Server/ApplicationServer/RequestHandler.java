@@ -4,18 +4,22 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 
+import Src.Domain.Server.Server;
 import Src.Domain.Server.Message.Message;
 import Utils.Logger;
 
 public class RequestHandler implements Runnable {
     private Logger logger;
     private Socket client;
+    private Server serverCore;
     private ObjectOutputStream clientOutput;
     private ObjectInputStream clientInput;
     
-    public RequestHandler(Socket client) throws IOException {
+    public RequestHandler(Socket client, Server server) throws IOException {
         this.logger = new Logger("Logs/ApplicationServerLogs.log");
+        this.serverCore = server;
         this.client = client;
 
         try {
@@ -34,7 +38,28 @@ public class RequestHandler implements Runnable {
         while (true) {
             try {
                 Message message = (Message) this.clientInput.readObject();
+
+                this.logger.info("Mensagem recebida do cliente: " + this.client.getInetAddress().getHostAddress());
+                this.logger.info("Operação: " + message.getOperation());
+
+                switch (message.getOperation()) {
+                    case "store":
+                        Message storeResponse = this.serverCore.storeServiceOrder(message);
+
+                        this.logger.info("Novo dado salvo no banco pelo cliente: " + this.client.getInetAddress().getHostAddress());
+
+                        this.clientOutput.writeObject(storeResponse);
+                        break;
+                    case "getAll":
+                        List<Message> listResponse = this.serverCore.listServiceOrders();
                 
+                        this.clientOutput.writeObject(listResponse);
+
+                        this.logger.info("Listagem retornada para o cliente: " + this.client.getInetAddress().getHostAddress());
+                    default:
+                        break;
+                }
+
                 
             } catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();

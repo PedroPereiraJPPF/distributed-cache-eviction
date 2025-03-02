@@ -1,5 +1,6 @@
 package Src.Domain.Client;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -23,7 +24,8 @@ public class Client implements ClientInterface {
     private ServerInterface server;
     private Socket serverSocket;
     private ObjectInputStream input;
-    private ObjectOutputStream output; 
+    private ObjectOutputStream output;
+    private boolean authenticated; 
 
     public Client() {
         this.serverData = new ServerData("localhost", 5000);
@@ -71,7 +73,11 @@ public class Client implements ClientInterface {
 
             String authResponse = (String) this.input.readObject();
 
-            return authResponse.equals("auth:valid");
+            System.out.println(authResponse);
+
+            this.authenticated = authResponse.equals("auth:valid");
+
+            return this.authenticated;
         } catch (Exception e) {
             return false;
         }
@@ -79,9 +85,21 @@ public class Client implements ClientInterface {
 
     @Override
     public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException {
-        Message serverMessage = this.server.storeServiceOrder(message);
+        try {
+            this.output.writeObject(message);
 
-        return this.messageToServiceOrder(serverMessage);
+            System.out.println("esperando resposta");
+
+            Message response = (Message) this.input.readObject();
+
+            return this.messageToServiceOrder(response);
+        } catch (ClassNotFoundException | IOException e) {
+            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            throw e;
+        }
+
+        return null;
     }
 
     @Override
@@ -121,11 +139,17 @@ public class Client implements ClientInterface {
     public List<ServiceOrderInterface> listServiceOrders(Message newMessage) throws ParseException {
         List<ServiceOrderInterface> orders = new ArrayList<>();
 
-        // List<Message> messages = this.server.listServiceOrders(newMessage);
+        try {
+            this.output.writeObject(newMessage);
 
-        // for (Message message : messages) {
-        //     orders.add(this.messageToServiceOrder(message));
-        // }
+            List<Message> messages = (ArrayList<Message>) this.input.readObject();
+
+            for (Message message : messages) {
+                orders.add(this.messageToServiceOrder(message));
+            }
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
 
         return orders;
     }

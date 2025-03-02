@@ -16,7 +16,7 @@ public class RequestHandler implements Runnable {
     private ObjectInputStream inputServer;
     private ObjectOutputStream outputServer;
 
-    public RequestHandler(String serverIP, Integer serverPort, Socket client) throws IOException {
+    public RequestHandler(String serverIP, Integer serverPort, Socket client, ObjectInputStream in, ObjectOutputStream out) throws IOException {
         this.logger = new Logger("Logs/ProxyLogs.log");
 
         // instancia que controla o cliente
@@ -28,10 +28,10 @@ public class RequestHandler implements Runnable {
 
             this.logger.info("Conectado ao servidor de aplicação: " + serverIP + " port: " + serverPort);
 
-            this.inputClient = new ObjectInputStream(this.client.getInputStream());
-            this.outputClient = new ObjectOutputStream(this.client.getOutputStream());
-            this.inputServer = new ObjectInputStream(this.server.getInputStream());
+            this.outputClient = out;
+            this.inputClient = in;
             this.outputServer = new ObjectOutputStream(this.server.getOutputStream());
+            this.inputServer = new ObjectInputStream(this.server.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
 
@@ -45,6 +45,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         while (true) {
             try {

@@ -126,7 +126,7 @@ public class ClientView {
         System.out.print("Descrição da Ordem de Serviço: ");
         message.setDescription(this.scanner.nextLine());
 
-        client.storeServiceOrder(message);
+        this.client.storeServiceOrder(message);
 
         System.out.println(GREEN + "Ordem de serviço armazenada com sucesso. " + CHECK + RESET);
     }

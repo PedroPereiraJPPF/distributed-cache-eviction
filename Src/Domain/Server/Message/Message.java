@@ -1,7 +1,8 @@
 package Src.Domain.Server.Message;
+import java.io.Serializable;
 import java.util.Date;
 
-public class Message {
+public class Message implements Serializable {
     private String[] values;
     // as operações terão nomes simples, essa variavel não será codificada.
     private String operation;
@@ -12,6 +13,7 @@ public class Message {
     }
 
     public Message(String operation) {
+        this.values = new String[4];
         this.operation = operation;
     }
 
