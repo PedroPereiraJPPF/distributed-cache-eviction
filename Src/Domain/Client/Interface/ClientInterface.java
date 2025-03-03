@@ -1,5 +1,6 @@
 package Src.Domain.Client.Interface;
 
+import java.io.EOFException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -12,12 +13,12 @@ import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
  */
 public interface ClientInterface {
     public ServerInterface connectServer();
-    public boolean authenticate(String userData);
-    public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException;
-    public boolean deleteServiceOrder(Message message);
-    public ServiceOrderInterface getServiceOrder(Message orderId) throws ParseException;
-    public ServiceOrderInterface updateServiceOrder(Message message);
-    public List<ServiceOrderInterface> listServiceOrders(Message message) throws ParseException;
-    public int countServiceOrders();
+    public boolean authenticate(String userData) throws EOFException;
+    public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException, EOFException;
+    public boolean deleteServiceOrder(Message message) throws EOFException;
+    public ServiceOrderInterface getServiceOrder(Message orderId) throws ParseException, EOFException;
+    public ServiceOrderInterface updateServiceOrder(Message message) throws EOFException;
+    public List<ServiceOrderInterface> listServiceOrders(Message message) throws ParseException, EOFException;
+    public int countServiceOrders() throws EOFException;
     public int[] countOperations();
 }

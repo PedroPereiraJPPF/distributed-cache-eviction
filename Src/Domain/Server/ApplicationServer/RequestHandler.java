@@ -1,5 +1,6 @@
 package Src.Domain.Server.ApplicationServer;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -43,12 +44,26 @@ public class RequestHandler implements Runnable {
                 this.logger.info("Operação: " + message.getOperation());
 
                 switch (message.getOperation()) {
+                    case "get":
+                        Message getResponse = this.serverCore.getServiceOrder(message);
+
+                        this.logger.info("Novo dado solicitado pelo cliente: " + this.client.getInetAddress().getHostAddress());
+
+                        this.clientOutput.writeObject(getResponse);
+                        break;
                     case "store":
                         Message storeResponse = this.serverCore.storeServiceOrder(message);
 
                         this.logger.info("Novo dado salvo no banco pelo cliente: " + this.client.getInetAddress().getHostAddress());
 
                         this.clientOutput.writeObject(storeResponse);
+                        break;
+                    case "update":
+                        Message updateResponse = this.serverCore.updateServiceOrder(message);
+
+                        this.logger.info("Dado atualizado pelo cliente: " + this.client.getInetAddress().getHostAddress());
+
+                        this.clientOutput.writeObject(updateResponse);
                         break;
                     case "delete":
                         boolean deleteResponse = this.serverCore.deleteServiceOrder(message);
@@ -68,19 +83,25 @@ public class RequestHandler implements Runnable {
                         this.clientOutput.writeObject(listResponse);
 
                         this.logger.info("Listagem retornada para o cliente: " + this.client.getInetAddress().getHostAddress());
+                        break;
                     default:
                         break;
                 }
 
                 
+            } catch (EOFException e) {
+                e.printStackTrace();
+
+                this.logger.error("Conexão com servidor de proxy perdida");
+                this.logger.error("Encerrando conexão");
+
+                break;
             } catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
 
                 this.logger.error("Erro ao receber dados do cliente");
                 this.logger.error(e.getMessage());
             }
-            
-            
         }
     }
 }

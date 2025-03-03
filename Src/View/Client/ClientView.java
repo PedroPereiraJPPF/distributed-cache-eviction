@@ -1,5 +1,6 @@
 package Src.View.Client;
 
+import java.io.EOFException;
 import java.text.ParseException;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -71,8 +72,7 @@ public class ClientView {
                 System.out.println(YELLOW + "4. " + ARROW + " Atualizar Ordem de Serviço" + RESET);
                 System.out.println(YELLOW + "5. " + ARROW + " Listar Todas as Ordens de Serviço" + RESET);
                 System.out.println(YELLOW + "6. " + ARROW + " Contar Todas as Ordens de Serviço" + RESET);
-                System.out.println(YELLOW + "7. " + ARROW + " Contar Todas as operações feitas" + RESET);
-                System.out.println(RED + "8. " + ARROW + " Sair" + RESET);
+                System.out.println(RED + "7. " + ARROW + " Sair" + RESET);
                 System.out.print(CYAN + "Escolha uma opção: " + RESET);
             
                 int choice = scanner.nextInt();
@@ -98,9 +98,6 @@ public class ClientView {
                         countServiceOrders();
                         break;
                     case 7:
-                        countOperations();
-                        break;
-                    case 8:
                         System.out.println(PURPLE + "Saindo... " + CROSS + RESET);
                         return;
                     default:
@@ -109,13 +106,19 @@ public class ClientView {
             } catch (InputMismatchException e) {
                 System.out.println(RED + "Opção inválida. Por favor, tente novamente." + RESET);
                 scanner.nextLine();
+            } catch (EOFException e) {
+                System.out.println(RED + "A conexão com o servidor foi perdida, reinicie a aplicação e tente novamente em alguns segundos." + RESET);
+
+                authenticated = false;
             } catch (Exception e) {
                 System.out.println(RED + "ERRO INTERNO DO SERVIDOR." + e.getMessage() + RESET);
+
+                e.printStackTrace();
             }
         }
     }
 
-    public void storeServiceOrder() throws ParseException {
+    public void storeServiceOrder() throws ParseException, EOFException {
         Message message = new Message("store");
 
         System.out.println("Digite os detalhes da ordem de serviço:");
@@ -131,7 +134,7 @@ public class ClientView {
         System.out.println(GREEN + "Ordem de serviço armazenada com sucesso. " + CHECK + RESET);
     }
 
-    public void deleteServiceOrderById() {
+    public void deleteServiceOrderById() throws EOFException {
         System.out.print(CYAN + ARROW + " Digite o ID da Ordem de Serviço: " + RESET);
         int id = scanner.nextInt();
         scanner.nextLine();
@@ -151,7 +154,7 @@ public class ClientView {
         }
     }
 
-    public void getServiceOrderById() throws ParseException {
+    public void getServiceOrderById() throws ParseException, EOFException {
         System.out.print(CYAN + ARROW + " Digite o ID da Ordem de Serviço: " + RESET);
         int id = scanner.nextInt();
         scanner.nextLine();
@@ -167,7 +170,7 @@ public class ClientView {
         }
     }
 
-    public void updateServiceOrder() {
+    public void updateServiceOrder() throws EOFException {
         Message message = new Message("update");
 
         System.out.println("Digite os detalhes da ordem de serviço:");
@@ -198,7 +201,7 @@ public class ClientView {
         System.out.println(GREEN + "Ordem de serviço atualizada com sucesso. " + CHECK + RESET);
     }
 
-    public void listServiceOrders() throws ParseException {
+    public void listServiceOrders() throws ParseException, EOFException {
         Message message = new Message("getAll");
 
         List<ServiceOrderInterface> orders = client.listServiceOrders(message);
@@ -213,23 +216,13 @@ public class ClientView {
         }
     }
 
-    public void countServiceOrders() throws ParseException {
-        Message message = new Message("getAll");
-        
-        List<ServiceOrderInterface> orders = client.listServiceOrders(message);
+    public void countServiceOrders() throws ParseException, EOFException {
+        int orders = this.client.countServiceOrders();
 
-        if (orders.isEmpty()) {
+        if (orders == 0) {
             System.out.println(RED + "Nenhuma ordem de serviço encontrada. " + CROSS + RESET);
         } else {
-            System.out.println(GREEN + "Contagem de ordens de serviço: " + client.countServiceOrders() + RESET);
+            System.out.println(GREEN + "Contagem de ordens de serviço: " + orders + RESET);
         }
-    }
-
-    public void countOperations() throws ParseException {
-        int[] operationsCount = client.countOperations();
-        
-        System.out.println(GREEN + "Inserções: " + operationsCount[0] + RESET);
-        System.out.println(GREEN + "Atualizações: " + operationsCount[1] + RESET);
-        System.out.println(GREEN + "Deleções: " + operationsCount[2] + RESET);
     }
 }

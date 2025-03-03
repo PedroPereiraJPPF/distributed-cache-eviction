@@ -1,5 +1,6 @@
 package Src.Domain.Client;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -84,13 +85,15 @@ public class Client implements ClientInterface {
     }
 
     @Override
-    public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException {
+    public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException, EOFException {
         try {
             this.output.writeObject(message);
 
             Message response = (Message) this.input.readObject();
 
             return this.messageToServiceOrder(response);
+        } catch (EOFException e) {
+            throw e;
         } catch (ClassNotFoundException | IOException e) {
             System.out.println(e.getMessage());
         } catch (Exception e) {
@@ -101,13 +104,15 @@ public class Client implements ClientInterface {
     }
 
     @Override
-    public boolean deleteServiceOrder(Message message) {
+    public boolean deleteServiceOrder(Message message) throws EOFException {
         try {
             this.output.writeObject(message);
 
             boolean response = (boolean) this.input.readObject();
 
             return response;
+        } catch (EOFException e) {
+            throw e;
         } catch(ClassNotFoundException | IOException e) {
             System.out.println(e.getMessage());
 
@@ -118,8 +123,20 @@ public class Client implements ClientInterface {
     }
 
     @Override
-    public ServiceOrderInterface getServiceOrder(Message message) throws ParseException {
-        Message serverMessage = this.server.getServiceOrder(message);
+    public ServiceOrderInterface getServiceOrder(Message message) throws ParseException, EOFException {
+        Message serverMessage = null;
+
+        try {
+            this.output.writeObject(message);
+
+            serverMessage = (Message) this.input.readObject();
+        } catch (EOFException e) {
+            throw e;
+        } catch(ClassNotFoundException | IOException e) {
+            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            throw e;
+        }
 
         if (serverMessage == null) {
             return null;
@@ -129,22 +146,38 @@ public class Client implements ClientInterface {
     }
 
     @Override
-    public ServiceOrderInterface updateServiceOrder(Message message) {
+    public ServiceOrderInterface updateServiceOrder(Message message) throws EOFException {
+        Message serverMessage = null;
+
         try {
-            Message serverMessage = this.server.updateServiceOrder(message);
+            this.output.writeObject(message);
 
-            if (serverMessage == null) {
-                return null;
-            }
+            serverMessage = (Message) this.input.readObject();
+        } catch (EOFException e) {
+            throw e;
+        } catch(ClassNotFoundException | IOException e) {
+            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            throw e;
+        }
 
+        if (serverMessage == null) {
+            return null;
+        }
+
+        try {
             return this.messageToServiceOrder(serverMessage);
         } catch (ParseException e) {
+            e.printStackTrace();
+
+            System.out.println("Erro ao converter mensagem do servidor");
+
             return null;
         }
     }
 
     @Override
-    public List<ServiceOrderInterface> listServiceOrders(Message newMessage) throws ParseException {
+    public List<ServiceOrderInterface> listServiceOrders(Message newMessage) throws ParseException, EOFException {
         List<ServiceOrderInterface> orders = new ArrayList<>();
 
         try {
@@ -155,6 +188,8 @@ public class Client implements ClientInterface {
             for (Message message : messages) {
                 orders.add(this.messageToServiceOrder(message));
             }
+        } catch (EOFException e) {
+            throw e;
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
@@ -163,8 +198,18 @@ public class Client implements ClientInterface {
     }
 
     @Override
-    public int countServiceOrders() {
-        return this.server.listServiceOrders().size();
+    public int countServiceOrders() throws EOFException {
+        Message message = new Message("getAll");
+
+        try {
+            return this.listServiceOrders(message).size();
+        } catch (ParseException e) {
+            e.printStackTrace();
+
+            System.out.println("Erro ao converter mensagem do servidor");
+
+            return 0;
+        }
     }
 
     public int[] countOperations() {

@@ -106,7 +106,12 @@ public class RequestHandler implements Runnable {
                 e.printStackTrace();
 
                 this.logger.error("Erro interno no proxy para o cliente: " + this.client.getInetAddress().getHostAddress());
-                this.logger.error(e.getMessage());
+
+                authenticated = false;
+
+                this.logger.warning("Cliente " + this.client.getInetAddress().getHostAddress() + " desconectado por causa de falha interna do servidor");
+
+                this.logger.error(e.getStackTrace().toString());
             }
         }
     }

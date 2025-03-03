@@ -11,8 +11,6 @@ import Src.Domain.Structures.ServiceOrder.ServiceOrder;
 import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 import Utils.Logger;
 
-import java.text.ParseException;
-
 public class Server implements ServerInterface {
     private Object lock = new Object();
     private HashDatabase database;
@@ -142,7 +140,7 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public Message updateServiceOrder(Message message) throws ParseException {
+    public Message updateServiceOrder(Message message) {
         CompressedObject data = message.getData();
 
         int code = Integer.valueOf(CompressionManager.decodeParameter(data.getValues()[0], data.getFrequencyTable()));
