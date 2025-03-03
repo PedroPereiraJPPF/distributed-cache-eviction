@@ -50,6 +50,18 @@ public class RequestHandler implements Runnable {
 
                         this.clientOutput.writeObject(storeResponse);
                         break;
+                    case "delete":
+                        boolean deleteResponse = this.serverCore.deleteServiceOrder(message);
+
+                        if (deleteResponse) {
+                            this.logger.info("Ordem de serviço deletada");
+                        } else {
+                            this.logger.info("Falha ao deletar ordem de serviço");
+                        }
+
+                        this.clientOutput.writeObject(deleteResponse);
+
+                        break;
                     case "getAll":
                         List<Message> listResponse = this.serverCore.listServiceOrders();
                 

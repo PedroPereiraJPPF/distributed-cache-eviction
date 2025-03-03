@@ -9,7 +9,7 @@ import Utils.Logger;
 
 public class ApplicationServer {
     public static void main(String[] args) {
-        Logger logger = new Logger("Logs/AplicationServerLogs.log");
+        Logger logger = new Logger("Logs/ApplicationServerLogs.log");
         ServerSocket server;
         // Essa classe serve para controlar as operações no banco e descompressão das mensagens
         Server serverCore = new Server(); 

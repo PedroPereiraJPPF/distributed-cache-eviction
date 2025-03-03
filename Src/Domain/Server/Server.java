@@ -14,6 +14,7 @@ import Utils.Logger;
 import java.text.ParseException;
 
 public class Server implements ServerInterface {
+    private Object lock = new Object();
     private HashDatabase database;
     private Logger opLogger = new Logger("Logs/OperationsLogs.log");
 
@@ -93,7 +94,9 @@ public class Server implements ServerInterface {
         serviceOrder.setName(CompressionManager.decodeParameter(data.getValues()[1], data.getFrequencyTable()));
         serviceOrder.setDescription(CompressionManager.decodeParameter(data.getValues()[2], data.getFrequencyTable()));
 
-        serviceOrder = this.database.insert(serviceOrder);
+        synchronized (this.lock) {
+            serviceOrder = this.database.insert(serviceOrder);
+        }
 
         Message compactedMessage = new Message(serviceOrder.getCode(), serviceOrder.getName(), serviceOrder.getDescription(), serviceOrder.getRequestTime());
         
@@ -112,14 +115,20 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public void deleteServiceOrder(Message message) {
+    public boolean deleteServiceOrder(Message message) {
         CompressedObject data = message.getData();
 
         int code = Integer.valueOf(CompressionManager.decodeParameter(data.getValues()[0], data.getFrequencyTable()));
 
-        this.database.delete(code);
+        boolean success = false;
+
+        synchronized (this.lock) {
+            success = this.database.delete(code);
+        }
 
         this.database.printAll();
+
+        return success;
     }
 
     @Override
@@ -143,11 +152,14 @@ public class Server implements ServerInterface {
         if (serviceOrder == null)
             return null;
 
-        this.opLogger.info("UPDATE");
+        synchronized (this.lock) {
 
-        serviceOrder.setCode(code);
-        serviceOrder.setName(CompressionManager.decodeParameter(data.getValues()[1], data.getFrequencyTable()));
-        serviceOrder.setDescription(CompressionManager.decodeParameter(data.getValues()[2], data.getFrequencyTable()));
+            this.opLogger.info("UPDATE");
+
+            serviceOrder.setCode(code);
+            serviceOrder.setName(CompressionManager.decodeParameter(data.getValues()[1], data.getFrequencyTable()));
+            serviceOrder.setDescription(CompressionManager.decodeParameter(data.getValues()[2], data.getFrequencyTable()));
+        }
 
         Message compactedMessage = new Message(serviceOrder.getCode(), serviceOrder.getName(), serviceOrder.getDescription(), serviceOrder.getRequestTime());
 

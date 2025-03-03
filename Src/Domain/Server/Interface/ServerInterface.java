@@ -13,7 +13,7 @@ public interface ServerInterface {
     public ServiceOrderInterface getServiceOrder(ServiceOrderInterface serviceOrder);
     public Message storeServiceOrder(Message message);
     public ServiceOrderInterface storeServiceOrder(ServiceOrderInterface serviceOrder);
-    public void deleteServiceOrder(Message message);
+    public boolean deleteServiceOrder(Message message);
     public void deleteServiceOrder(int code);
     public void deleteServiceOrder(ServiceOrderInterface serviceOrder);
     public Message updateServiceOrder(Message Message) throws ParseException;

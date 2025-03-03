@@ -1,18 +1,16 @@
 package Src.Domain.Proxy;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import Utils.Logger;
 
 public class ProxyServer {
-    public static void main(String[] args) {
-        final String authName = "admin";
-        final String password = "123456";
+    public static String authName = "admin";
+    public static String password = "123456";
 
+    public static void main(String[] args) {
         final String applicationServerIp = "localhost";
         final int applicationServerPort = 5002;
 
@@ -33,46 +31,15 @@ public class ProxyServer {
         System.out.println("Proxy iniciado");
         logger.info("Proxy iniciado");
 
+        logger.info("Conectado ao servidor de aplicação: " + applicationServerIp + " port: " + applicationServerPort);
+
         while(true) {
             try {
-                logger.info("Conectado ao servidor de aplicação: " + applicationServerIp + " port: " + applicationServerPort);
+                Socket client = server.accept();
 
-                while (true) {
-                    Socket client = server.accept();
+                logger.info("Cliente de IP: " + client.getInetAddress().getHostAddress() + " conectado");
 
-                    logger.info("Cliente de IP: " + client.getInetAddress().getHostAddress() + " conectado");
-
-                    ObjectOutputStream clientOutput = new ObjectOutputStream(client.getOutputStream());
-                    ObjectInputStream clientInput = new ObjectInputStream(client.getInputStream());
-
-                    // clientOutput.writeObject(new String("auth:request"));
-
-                    logger.info("Dados de authenticação solicitados");
-
-                    String response = (String) clientInput.readObject();
-
-                    logger.info("Dados de authenticação recebidos");
-
-                    String[] userData = response.split(":");
-
-                    if (!(userData[0].equals(authName) && userData[1].equals(password))) {
-                        logger.info("Usuario não reconhecido");
-
-                        clientOutput.writeObject(new String("auth:invalid"));
-
-                        client.close();
-
-                        continue;
-                    }
-
-                    clientOutput.writeObject(new String("auth:valid"));
-
-                    System.out.println("Thread vai iniciar");
-
-                    new Thread(new RequestHandler(applicationServerIp, applicationServerPort, client, clientInput, clientOutput)).start();
-
-                    System.out.println("Thread iniciada");
-                }
+                new Thread(new RequestHandler(applicationServerIp, applicationServerPort, client)).start();
             } catch (IOException e) {
                 e.printStackTrace();
                 

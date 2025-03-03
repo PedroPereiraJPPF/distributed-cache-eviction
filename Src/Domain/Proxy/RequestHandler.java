@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import Src.Domain.Server.Message.Message;
 import Utils.Logger;
 
 public class RequestHandler implements Runnable {
@@ -16,7 +15,7 @@ public class RequestHandler implements Runnable {
     private ObjectInputStream inputServer;
     private ObjectOutputStream outputServer;
 
-    public RequestHandler(String serverIP, Integer serverPort, Socket client, ObjectInputStream in, ObjectOutputStream out) throws IOException {
+    public RequestHandler(String serverIP, Integer serverPort, Socket client) throws IOException {
         this.logger = new Logger("Logs/ProxyLogs.log");
 
         // instancia que controla o cliente
@@ -28,8 +27,8 @@ public class RequestHandler implements Runnable {
 
             this.logger.info("Conectado ao servidor de aplicação: " + serverIP + " port: " + serverPort);
 
-            this.outputClient = out;
-            this.inputClient = in;
+            this.outputClient = new ObjectOutputStream(client.getOutputStream());
+            this.inputClient = new ObjectInputStream(client.getInputStream());
             this.outputServer = new ObjectOutputStream(this.server.getOutputStream());
             this.inputServer = new ObjectInputStream(this.server.getInputStream());
         } catch (IOException e) {
@@ -47,10 +46,42 @@ public class RequestHandler implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        boolean authenticated = false;
+
+        try {
+            logger.info("Dados de authenticação solicitados");
+
+            String response = (String) this.inputClient.readObject();
+
+            logger.info("Dados de authenticação recebidos");
+
+            String[] userData = response.split(":");
+
+            if (!(userData[0].equals(ProxyServer.authName) && userData[1].equals(ProxyServer.password))) {
+                logger.info("Usuario: " + this.client.getInetAddress().getHostAddress() + " não reconhecido");
+
+                this.outputClient.writeObject(new String("auth:invalid"));
+
+                client.close();
+
+                return;
+            }
+
+            this.logger.info("Usuario: " + this.client.getInetAddress().getHostAddress() + " Authenticado");
+
+            this.outputClient.writeObject(new String("auth:valid"));
+
+            authenticated = true;
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+
+            this.logger.error("Erro ao realizar a authenticação");
+        }
+
+        while (authenticated) {
             try {
                 // recebe a mensagem do cliente e reenvia para o servidor
-                Message clientMessage = (Message) this.inputClient.readObject();
+                Object clientMessage = this.inputClient.readObject();
 
                 this.logger.info("Mensagem recebida IP: " + this.client.getInetAddress().getHostAddress());
 
@@ -59,7 +90,7 @@ public class RequestHandler implements Runnable {
                 this.logger.info("Mensagem enviada para servidor de IP: " + this.server.getInetAddress().getHostAddress());
 
                 // recebe a resposta do servidor e reenvia para o cliente
-                Message serverMessage = (Message) this.inputServer.readObject();
+                Object serverMessage = this.inputServer.readObject();
 
                 this.logger.info("Mensagem recebida do servidor de IP: " + this.server.getInetAddress().getHostAddress());
 

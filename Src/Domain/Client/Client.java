@@ -88,8 +88,6 @@ public class Client implements ClientInterface {
         try {
             this.output.writeObject(message);
 
-            System.out.println("esperando resposta");
-
             Message response = (Message) this.input.readObject();
 
             return this.messageToServiceOrder(response);
@@ -104,9 +102,19 @@ public class Client implements ClientInterface {
 
     @Override
     public boolean deleteServiceOrder(Message message) {
-        this.server.deleteServiceOrder(message);
+        try {
+            this.output.writeObject(message);
 
-        return true;
+            boolean response = (boolean) this.input.readObject();
+
+            return response;
+        } catch(ClassNotFoundException | IOException e) {
+            System.out.println(e.getMessage());
+
+            return false;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override

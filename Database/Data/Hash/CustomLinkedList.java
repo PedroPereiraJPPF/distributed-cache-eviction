@@ -64,14 +64,14 @@ public class CustomLinkedList {
                     this.tail = previous;
                 }
 
-                return false;
+                return true;
             }
 
             previous = current;
             current = current.next;
         }
 
-        return true;
+        return false;
     }
 
     public Node getHead() {
