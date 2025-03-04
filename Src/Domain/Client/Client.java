@@ -46,8 +46,6 @@ public class Client implements ClientInterface {
 
             this.serverSocket.close();
 
-            System.out.println("tentou criar a nova conexão");
-
             this.server = new Server();
 
             return this.server;
@@ -73,8 +71,6 @@ public class Client implements ClientInterface {
             this.output.writeObject(userData);
 
             String authResponse = (String) this.input.readObject();
-
-            System.out.println(authResponse);
 
             this.authenticated = authResponse.equals("auth:valid");
 
@@ -210,16 +206,6 @@ public class Client implements ClientInterface {
 
             return 0;
         }
-    }
-
-    public int[] countOperations() {
-        int[] operationsCount = {0 , 0, 0};
-
-        operationsCount[0] = this.server.countOperation("INSERT");
-        operationsCount[1] = this.server.countOperation("UPDATE");
-        operationsCount[2] = this.server.countOperation("DELETE");
-
-        return operationsCount;
     }
 
     private ServiceOrderInterface messageToServiceOrder(Message message) throws ParseException {

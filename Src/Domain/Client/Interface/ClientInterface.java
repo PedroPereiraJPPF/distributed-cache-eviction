@@ -20,5 +20,4 @@ public interface ClientInterface {
     public ServiceOrderInterface updateServiceOrder(Message message) throws EOFException;
     public List<ServiceOrderInterface> listServiceOrders(Message message) throws ParseException, EOFException;
     public int countServiceOrders() throws EOFException;
-    public int[] countOperations();
 }

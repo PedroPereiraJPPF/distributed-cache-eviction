@@ -33,9 +33,11 @@ public class Logger {
     }
 
     public void log(String level, String message) {
-        String timestamp = dateFormat.format(new Date());
-        String logMessage = String.format("[%s] %s: %s", timestamp, level, message);
-        writeLog(logMessage);
+        synchronized (this) {
+            String timestamp = dateFormat.format(new Date());
+            String logMessage = String.format("[%s] %s: %s", timestamp, level, message);
+            writeLog(logMessage);
+        }
     }
 
     public void info(String message) {

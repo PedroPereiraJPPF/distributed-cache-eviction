@@ -8,7 +8,7 @@ public class HashCache {
     private int capacity;
     private int size;
     private ServiceOrderInterface[] table;
-    private Logger logger = new Logger("Logs/ServerLogs.log"); 
+    private Logger logger = new Logger("Logs/CacheLogs.log"); 
     
     public HashCache(int capacity) {
         this.capacity = capacity;
@@ -39,6 +39,8 @@ public class HashCache {
         table[index] = order;
         this.size++;
 
+        this.logger.info("Novo item adicionado na cache id: " + order.getCode());
+
         return order;
     }
 
@@ -49,6 +51,8 @@ public class HashCache {
 
         while (table[index] != null) {
             if (table[index].getCode() == key) {
+
+                this.logger.info("Item encontrado na cache id: " + key);
 
                 return table[index];
             }
@@ -75,6 +79,8 @@ public class HashCache {
                 this.size--;
 
                 this.printElements();
+
+                this.logger.info("Item removido da cache id: " + key);
 
                 return true;
             }

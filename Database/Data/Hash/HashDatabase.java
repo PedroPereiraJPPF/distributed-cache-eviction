@@ -13,7 +13,6 @@ public class HashDatabase implements Serializable {
     private int size;
     private CustomLinkedList[] table;
     private Logger logger = new Logger("Logs/DatabaseLogs.log");
-    private Logger opLogger = new Logger("Logs/OperationsLogs.log");
     
     public HashDatabase() {
         this.capacity = 20;
@@ -27,8 +26,6 @@ public class HashDatabase implements Serializable {
         }
 
         int key = hash(order.getCode());
-
-        this.opLogger.info("INSERT");
 
         if (table[key] == null) {
             table[key] = new CustomLinkedList(order);
@@ -66,8 +63,6 @@ public class HashDatabase implements Serializable {
             table[hash] = null;
             this.size--;
         }
-
-        this.opLogger.info("DELETE");
 
         return result;
     }

@@ -46,6 +46,7 @@ public class RequestHandler implements Runnable {
                 switch (message.getOperation()) {
                     case "get":
                         Message getResponse = this.serverCore.getServiceOrder(message);
+                        getResponse.setOperation("update-cache:get");
 
                         this.logger.info("Novo dado solicitado pelo cliente: " + this.client.getInetAddress().getHostAddress());
 
@@ -60,6 +61,7 @@ public class RequestHandler implements Runnable {
                         break;
                     case "update":
                         Message updateResponse = this.serverCore.updateServiceOrder(message);
+                        updateResponse.setOperation("update-cache:update");
 
                         this.logger.info("Dado atualizado pelo cliente: " + this.client.getInetAddress().getHostAddress());
 
