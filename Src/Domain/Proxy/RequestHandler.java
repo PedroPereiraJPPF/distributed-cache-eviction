@@ -143,7 +143,11 @@ public class RequestHandler implements Runnable {
                 if (serverMessage instanceof Message) {
                     Message message = (Message) serverMessage;
                     String serverOperation = message.getOperation();
-                    String[] operationParts = serverOperation.split(":");
+                    String[] operationParts = {"none"};
+
+                    if (serverOperation != null) {
+                        serverOperation.split(":");
+                    }
 
                     if (operationParts[0].equals("update-cache")) {
                         ServiceOrderInterface so = this.messageToServiceOrder(message);
