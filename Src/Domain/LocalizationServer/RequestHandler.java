@@ -14,10 +14,10 @@ class RequestHandler implements Runnable {
     private ServerData loadBalancerData;
     private Logger logger;
 
-    public RequestHandler(Socket socket, Integer serverPort, String serverIP) {
+    public RequestHandler(Socket socket, Integer serverPort, String serverIP, Logger logger) {
         this.socket = socket;
         this.loadBalancerData = new ServerData(serverIP, serverPort);
-        this.logger = new Logger("Logs/LocalizationServer.log");
+        this.logger = logger;
     }
 
     public void run() {

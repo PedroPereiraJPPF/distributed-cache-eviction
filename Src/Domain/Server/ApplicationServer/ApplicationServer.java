@@ -25,7 +25,7 @@ public class ApplicationServer {
                 logger.info("Cliente conectado");
                 System.out.println("Cliente conectado");
 
-                new Thread(new RequestHandler(client, serverCore)).start();
+                new Thread(new RequestHandler(client, serverCore, logger)).start();
             }
 
         } catch (IOException e) {

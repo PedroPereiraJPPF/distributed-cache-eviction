@@ -25,7 +25,7 @@ public class LocalizationServer {
 
                 logger.info("Cliente de ip: " + cliente.getInetAddress().getHostAddress() + " conectou ao servidor de localização");
 
-                new Thread(new RequestHandler(cliente, proxyPort, proxyIP)).start();;
+                new Thread(new RequestHandler(cliente, proxyPort, proxyIP, logger)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();

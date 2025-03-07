@@ -25,8 +25,8 @@ public class RequestHandler implements Runnable {
     private ObjectInputStream inputServer;
     private ObjectOutputStream outputServer;
 
-    public RequestHandler(String serverIP, Integer serverPort, Socket client) throws IOException {
-        this.logger = new Logger("Logs/ProxyLogs.log");
+    public RequestHandler(String serverIP, Integer serverPort, Socket client, Logger logger) throws IOException {
+        this.logger = logger;
 
         // instancia que controla o cliente
         this.client = client;
@@ -66,6 +66,15 @@ public class RequestHandler implements Runnable {
             logger.info("Dados de authenticação recebidos");
 
             String[] userData = response.split(":");
+
+            if (userData.length < 2) {
+                logger.info("Usuario: " + this.client.getInetAddress().getHostAddress() + " não reconhecido");
+                
+                this.outputClient.writeObject(new String("auth:invalid"));
+                
+                client.close();
+                return;
+            }
 
             if (!(userData[0].equals(ProxyServer.authName) && userData[1].equals(ProxyServer.password))) {
                 logger.info("Usuario: " + this.client.getInetAddress().getHostAddress() + " não reconhecido");

@@ -42,7 +42,7 @@ public class ProxyServer {
 
                 logger.info("Cliente de IP: " + client.getInetAddress().getHostAddress() + " conectado");
 
-                new Thread(new RequestHandler(applicationServerIp, applicationServerPort, client)).start();
+                new Thread(new RequestHandler(applicationServerIp, applicationServerPort, client, logger)).start();
             } catch (IOException e) {
                 e.printStackTrace();
                 

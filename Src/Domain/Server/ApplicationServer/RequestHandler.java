@@ -18,8 +18,8 @@ public class RequestHandler implements Runnable {
     private ObjectOutputStream clientOutput;
     private ObjectInputStream clientInput;
     
-    public RequestHandler(Socket client, Server server) throws IOException {
-        this.logger = new Logger("Logs/ApplicationServerLogs.log");
+    public RequestHandler(Socket client, Server server, Logger logger) throws IOException {
+        this.logger = logger;
         this.serverCore = server;
         this.client = client;
 
