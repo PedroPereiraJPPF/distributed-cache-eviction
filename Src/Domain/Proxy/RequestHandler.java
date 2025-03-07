@@ -99,7 +99,7 @@ public class RequestHandler implements Runnable {
 
                 String operation = convertedMessage.getOperation();
 
-                if (Arrays.asList(new String[]{"get"}).contains(operation)) {
+                if (operation.equals("get")) {
                     ServiceOrderInterface serviceOrder = this.messageToServiceOrder(convertedMessage);
 
                     ServiceOrderInterface value = ProxyServer.cache.find(serviceOrder.getCode());
@@ -146,7 +146,7 @@ public class RequestHandler implements Runnable {
                     String[] operationParts = {"none"};
 
                     if (serverOperation != null) {
-                        serverOperation.split(":");
+                        operationParts = serverOperation.split(":");
                     }
 
                     if (operationParts[0].equals("update-cache")) {
