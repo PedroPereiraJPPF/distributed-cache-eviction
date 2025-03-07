@@ -3,6 +3,7 @@ package Src.Domain.Proxy;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 
 import Database.Cache.Cache;
 import Utils.Logger;
@@ -10,6 +11,13 @@ import Utils.Logger;
 public class ProxyServer {
     public static String authName = "admin";
     public static String password = "123456";
+
+    public static final Map<String, String> users = Map.of(
+        "user", "123456",
+        "user2", "123456",
+        "user3", "123456"
+    );
+    
     // inicia a cache como uma tabela hash que usa remoção aleatoria
     public static Cache cache = new Cache(5);
 

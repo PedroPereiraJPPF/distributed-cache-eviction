@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 
 import Src.Domain.Server.Message.CompressedObject;
 import Src.Domain.Server.Message.CompressionManager;
@@ -58,6 +59,8 @@ public class RequestHandler implements Runnable {
     public void run() {
         boolean authenticated = false;
 
+        Map<String, String> users = ProxyServer.users; 
+
         try {
             logger.info("Dados de authenticação solicitados");
 
@@ -76,7 +79,9 @@ public class RequestHandler implements Runnable {
                 return;
             }
 
-            if (!(userData[0].equals(ProxyServer.authName) && userData[1].equals(ProxyServer.password))) {
+            String password = users.get(userData[0]);
+
+            if (password == null || !password.equals(userData[1])) {
                 logger.info("Usuario: " + this.client.getInetAddress().getHostAddress() + " não reconhecido");
 
                 this.outputClient.writeObject(new String("auth:invalid"));
