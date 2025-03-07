@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import Database.Cache.Hash.HashCache;
+import Database.Cache.Cache;
 import Utils.Logger;
 
 public class ProxyServer {
     public static String authName = "admin";
     public static String password = "123456";
     // inicia a cache como uma tabela hash que usa remoção aleatoria
-    public static HashCache cache = new HashCache(30);
+    public static Cache cache = new Cache(5);
 
     public static void main(String[] args) {
         final String applicationServerIp = "localhost";

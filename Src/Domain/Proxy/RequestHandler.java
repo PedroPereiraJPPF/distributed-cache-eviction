@@ -135,7 +135,7 @@ public class RequestHandler implements Runnable {
                         ServiceOrderInterface value = ProxyServer.cache.find(serviceOrder.getCode());
 
                         if (value != null) {
-                            ProxyServer.cache.delete(value.getCode());
+                            ProxyServer.cache.delete(value);
 
                             this.logger.info("Item removido da cache");
                         }
@@ -171,7 +171,7 @@ public class RequestHandler implements Runnable {
                             synchronized (ProxyServer.cache) {
                                 this.logger.info("Atualiza um item da cache");
 
-                                ProxyServer.cache.delete(so.getCode());
+                                ProxyServer.cache.delete(so);
 
                                 ProxyServer.cache.insert(so);
                             }

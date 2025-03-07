@@ -16,14 +16,14 @@ public class Cache {
         this.queue = new LinkedList<ServiceOrderInterface>();
         this.size = 0;
         this.maxSize = 20;
-        this.logger = new Logger("Logs/ServerLogs.log");
+        this.logger = new Logger("Logs/CacheLogs.log");
     }
 
     public Cache(int maxSize) {
         this.queue = new LinkedList<ServiceOrderInterface>();
         this.size = 0;
         this.maxSize = maxSize;
-        this.logger = new Logger("Logs/ServerLogs.log");
+        this.logger = new Logger("Logs/CacheLogs.log");
     }
 
     public ServiceOrderInterface insert(ServiceOrderInterface value) {
@@ -35,6 +35,8 @@ public class Cache {
 
         this.size++;
 
+
+        this.logger.info("Novo item adicionado na cache id: " + value.getCode());
         this.logger.info("Cache atual: \n" + this);
 
         return value;
@@ -60,6 +62,7 @@ public class Cache {
                 iterator.remove();
                 this.size--;
 
+                this.logger.info("Item removido da cache id: " + value.getCode());
                 this.logger.info("Cache atual: \n" + this);
                 
                 return current;
