@@ -24,10 +24,6 @@ public class Server implements ServerInterface {
 
             this.storeServiceOrder(serviceOrder);
         }
-
-        for (int i = 1; i <= 30; i++) {
-            this.getServiceOrder(i);
-        }
     }
 
     @Override

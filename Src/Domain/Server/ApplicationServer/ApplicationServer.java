@@ -12,7 +12,7 @@ public class ApplicationServer {
         Logger logger = new Logger("Logs/ApplicationServerLogs.log");
         ServerSocket server;
         // Essa classe serve para controlar as operações no banco e descompressão das mensagens
-        Server serverCore = new Server(); 
+        Server serverCore = new Server();
 
         try {
             server = new ServerSocket(5002);

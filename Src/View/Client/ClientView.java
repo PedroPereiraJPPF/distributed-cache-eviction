@@ -1,6 +1,7 @@
 package Src.View.Client;
 
 import java.io.EOFException;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -110,15 +111,17 @@ public class ClientView {
                 System.out.println(RED + "A conexão com o servidor foi perdida, reinicie a aplicação e tente novamente em alguns segundos." + RESET);
 
                 authenticated = false;
-            } catch (Exception e) {
-                System.out.println(RED + "ERRO INTERNO DO SERVIDOR." + e.getMessage() + RESET);
+            } catch (ClassNotFoundException e) {
+                System.out.println(RED + "Erro ao processar a resposta do servidor. " + CROSS + RESET);
+            } catch (IOException e) {
+                System.out.println(RED + "A conexão com o servidor foi perdida, reinicie a aplicação e tente novamente em alguns segundos." + RESET);
 
-                e.printStackTrace();
+                authenticated = false;
             }
         }
     }
 
-    public void storeServiceOrder() throws ParseException, EOFException {
+    public void storeServiceOrder() throws ParseException, ClassNotFoundException, IOException {
         Message message = new Message("store");
 
         System.out.println("Digite os detalhes da ordem de serviço:");
@@ -134,7 +137,7 @@ public class ClientView {
         System.out.println(GREEN + "Ordem de serviço armazenada com sucesso. " + CHECK + RESET);
     }
 
-    public void deleteServiceOrderById() throws EOFException {
+    public void deleteServiceOrderById() throws ClassNotFoundException, IOException {
         System.out.print(CYAN + ARROW + " Digite o ID da Ordem de Serviço: " + RESET);
         int id = scanner.nextInt();
         scanner.nextLine();
@@ -154,7 +157,7 @@ public class ClientView {
         }
     }
 
-    public void getServiceOrderById() throws ParseException, EOFException {
+    public void getServiceOrderById() throws ParseException, ClassNotFoundException, IOException {
         System.out.print(CYAN + ARROW + " Digite o ID da Ordem de Serviço: " + RESET);
         int id = scanner.nextInt();
         scanner.nextLine();
@@ -170,7 +173,7 @@ public class ClientView {
         }
     }
 
-    public void updateServiceOrder() throws EOFException {
+    public void updateServiceOrder() throws ClassNotFoundException, IOException {
         Message message = new Message("update");
 
         System.out.println("Digite os detalhes da ordem de serviço:");
@@ -201,7 +204,7 @@ public class ClientView {
         System.out.println(GREEN + "Ordem de serviço atualizada com sucesso. " + CHECK + RESET);
     }
 
-    public void listServiceOrders() throws ParseException, EOFException {
+    public void listServiceOrders() throws ParseException, ClassNotFoundException, IOException {
         Message message = new Message("getAll");
 
         List<ServiceOrderInterface> orders = client.listServiceOrders(message);
@@ -216,7 +219,7 @@ public class ClientView {
         }
     }
 
-    public void countServiceOrders() throws ParseException, EOFException {
+    public void countServiceOrders() throws ParseException, ClassNotFoundException, IOException {
         int orders = this.client.countServiceOrders();
 
         if (orders == 0) {

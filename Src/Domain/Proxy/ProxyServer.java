@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.Map;
 
 import Database.Cache.Cache;
+import Src.Domain.Structures.ServiceOrder.ServiceOrder;
 import Utils.Logger;
 
 public class ProxyServer {
@@ -19,11 +20,14 @@ public class ProxyServer {
     );
     
     // inicia a cache como uma tabela hash que usa remoção aleatoria
-    public static Cache cache = new Cache(5);
+    public static Cache cache = new Cache(30);
 
     public static void main(String[] args) {
         final String applicationServerIp = "localhost";
         final int applicationServerPort = 5002;
+
+        // Faz uma copia dos dados da aplicação para a cache
+        fullFillCache();
 
         Logger logger = new Logger("Logs/ProxyLogs.log");
         ServerSocket server = null;
@@ -66,6 +70,16 @@ public class ProxyServer {
 
         if (server != null) {
             logger.info("Servidor fechado");
+        }
+    }
+
+    public static void fullFillCache() {
+        for (int i = 1; i <= 30; i++) {
+            ServiceOrder serviceOrder = new ServiceOrder();
+            serviceOrder.setName("Ordem de Serviço " + i);
+            serviceOrder.setDescription("Descrição da Ordem de Serviço " + i);
+
+            cache.insert(serviceOrder);
         }
     }
 }

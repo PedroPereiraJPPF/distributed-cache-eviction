@@ -81,7 +81,7 @@ public class Client implements ClientInterface {
     }
 
     @Override
-    public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException, EOFException {
+    public ServiceOrderInterface storeServiceOrder(Message message) throws ParseException, EOFException, IOException, ClassNotFoundException {
         try {
             this.output.writeObject(message);
 
@@ -91,16 +91,14 @@ public class Client implements ClientInterface {
         } catch (EOFException e) {
             throw e;
         } catch (ClassNotFoundException | IOException e) {
-            System.out.println(e.getMessage());
+            throw e;
         } catch (Exception e) {
             throw e;
         }
-
-        return null;
     }
 
     @Override
-    public boolean deleteServiceOrder(Message message) throws EOFException {
+    public boolean deleteServiceOrder(Message message) throws EOFException, IOException, ClassNotFoundException {
         try {
             this.output.writeObject(message);
 
@@ -110,16 +108,14 @@ public class Client implements ClientInterface {
         } catch (EOFException e) {
             throw e;
         } catch(ClassNotFoundException | IOException e) {
-            System.out.println(e.getMessage());
-
-            return false;
+            throw e;
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ServiceOrderInterface getServiceOrder(Message message) throws ParseException, EOFException {
+    public ServiceOrderInterface getServiceOrder(Message message) throws ParseException, EOFException, IOException, ClassNotFoundException {
         Message serverMessage = null;
 
         try {
@@ -129,7 +125,7 @@ public class Client implements ClientInterface {
         } catch (EOFException e) {
             throw e;
         } catch(ClassNotFoundException | IOException e) {
-            System.out.println(e.getMessage());
+            throw e;
         } catch (Exception e) {
             throw e;
         }
@@ -142,7 +138,7 @@ public class Client implements ClientInterface {
     }
 
     @Override
-    public ServiceOrderInterface updateServiceOrder(Message message) throws EOFException {
+    public ServiceOrderInterface updateServiceOrder(Message message) throws EOFException, IOException, ClassNotFoundException {
         Message serverMessage = null;
 
         try {
@@ -152,7 +148,7 @@ public class Client implements ClientInterface {
         } catch (EOFException e) {
             throw e;
         } catch(ClassNotFoundException | IOException e) {
-            System.out.println(e.getMessage());
+            throw e;
         } catch (Exception e) {
             throw e;
         }
@@ -173,7 +169,7 @@ public class Client implements ClientInterface {
     }
 
     @Override
-    public List<ServiceOrderInterface> listServiceOrders(Message newMessage) throws ParseException, EOFException {
+    public List<ServiceOrderInterface> listServiceOrders(Message newMessage) throws ParseException, EOFException, IOException, ClassNotFoundException {
         List<ServiceOrderInterface> orders = new ArrayList<>();
 
         try {
@@ -187,14 +183,14 @@ public class Client implements ClientInterface {
         } catch (EOFException e) {
             throw e;
         } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
+            throw e;
         }
 
         return orders;
     }
 
     @Override
-    public int countServiceOrders() throws EOFException {
+    public int countServiceOrders() throws EOFException, IOException, ClassNotFoundException {
         Message message = new Message("getAll");
 
         try {
