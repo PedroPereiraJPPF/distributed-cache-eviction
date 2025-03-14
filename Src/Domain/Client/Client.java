@@ -219,8 +219,6 @@ public class Client implements ClientInterface {
         localization.serverInactive(serverData.IP, serverData.port);
 
         this.connectServer();
-
-        System.out.println("Novo servidor conectado IP: " + this.serverData.IP + " Port: " + this.serverData.port);
     }
 
     private ServiceOrderInterface messageToServiceOrder(Message message) throws ParseException {

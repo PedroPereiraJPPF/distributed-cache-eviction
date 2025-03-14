@@ -18,6 +18,8 @@ public class ClientView {
     private Scanner scanner;
     private String user = null;
     private String password = null;
+    private int choice;
+    private Message message;
 
     private static final String RESET = "\u001B[0m";
     private static final String RED = "\u001B[31m";
@@ -81,10 +83,10 @@ public class ClientView {
                 System.out.println(RED + "7. " + ARROW + " Sair" + RESET);
                 System.out.print(CYAN + "Escolha uma opção: " + RESET);
             
-                int choice = scanner.nextInt();
+                this.choice = scanner.nextInt();
                 scanner.nextLine();
 
-                switch (choice) {
+                switch (this.choice) {
                     case 1:
                         storeServiceOrder();
                         break;
@@ -113,26 +115,28 @@ public class ClientView {
                 System.out.println(RED + "Opção inválida. Por favor, tente novamente." + RESET);
                 scanner.nextLine();
             } catch (EOFException e) {
-                System.out.println(RED + "A conexão com o servidor foi perdida, reinicie a aplicação e tente novamente em alguns segundos." + RESET);
                 try {
                     this.client.changeServer();
 
                     authenticated = this.client.authenticate(user + ":" + password);
+
+                    resendMessage();
                 } catch (RemoteException | NotBoundException e1) {
-                    System.out.println(RED + "Erro ao se conectar ao servidor de localização. " + CROSS + RESET);
+                    System.out.println(RED + "A conexão com o servidor foi perdida, reinicie a aplicação e tente novamente em alguns segundos." + RESET);
 
                     authenticated = false;
                 }
             } catch (ClassNotFoundException e) {
                 System.out.println(RED + "Erro ao processar a resposta do servidor. " + CROSS + RESET);
             } catch (IOException e) {
-                System.out.println(RED + "A conexão com o servidor foi perdida, reinicie a aplicação e tente novamente em alguns segundos." + RESET);
                 try {
                     this.client.changeServer();
 
-                    authenticated = true;
+                    authenticated = this.client.authenticate(user + ":" + password);
+
+                    resendMessage();
                 } catch (RemoteException | NotBoundException e1) {
-                    System.out.println(RED + "Erro ao se conectar ao servidor de localização. " + CROSS + RESET);
+                    System.out.println(RED + "A conexão com o servidor foi perdida, reinicie a aplicação e tente novamente em alguns segundos." + RESET);
 
                     authenticated = false;
                 }
@@ -141,7 +145,7 @@ public class ClientView {
     }
 
     public void storeServiceOrder() throws ParseException, ClassNotFoundException, IOException {
-        Message message = new Message("store");
+        message = new Message("store");
 
         System.out.println("Digite os detalhes da ordem de serviço:");
 
@@ -161,7 +165,7 @@ public class ClientView {
         int id = scanner.nextInt();
         scanner.nextLine();
 
-        Message message = new Message("delete");
+        message = new Message("delete");
         message.setCode(id);
 
         if (id < 0) {
@@ -181,7 +185,7 @@ public class ClientView {
         int id = scanner.nextInt();
         scanner.nextLine();
 
-        Message message = new Message("get");
+        message = new Message("get");
         message.setCode(id);
 
         ServiceOrderInterface serviceOrder = client.getServiceOrder(message);
@@ -193,7 +197,7 @@ public class ClientView {
     }
 
     public void updateServiceOrder() throws ClassNotFoundException, IOException {
-        Message message = new Message("update");
+        message = new Message("update");
 
         System.out.println("Digite os detalhes da ordem de serviço:");
         
@@ -224,7 +228,7 @@ public class ClientView {
     }
 
     public void listServiceOrders() throws ParseException, ClassNotFoundException, IOException {
-        Message message = new Message("getAll");
+        message = new Message("getAll");
 
         List<ServiceOrderInterface> orders = client.listServiceOrders(message);
 
@@ -245,6 +249,66 @@ public class ClientView {
             System.out.println(RED + "Nenhuma ordem de serviço encontrada. " + CROSS + RESET);
         } else {
             System.out.println(GREEN + "Contagem de ordens de serviço: " + orders + RESET);
+        }
+    }
+
+    private void resendMessage() {
+        try {
+            switch (this.choice) {
+                case 1:
+                    this.client.storeServiceOrder(this.message);
+
+                    System.out.println(GREEN + "Ordem de serviço armazenada com sucesso. " + CHECK + RESET);
+                    break;
+                case 2:
+                    if (this.client.deleteServiceOrder(message)) {
+                        System.out.println(GREEN + "Ordem de serviço deletada com sucesso. " + CHECK + RESET);
+                    } else {
+                        System.out.println(RED + "Falha ao deletar a ordem de serviço. " + CROSS + RESET);
+                    }
+                    break;
+                case 3:
+                    ServiceOrderInterface serviceOrder = this.client.getServiceOrder(this.message);
+                    if (serviceOrder != null) {
+                        System.out.println(GREEN + "Ordem de serviço encontrada: " + CHECK + " " + serviceOrder + RESET);
+                    } else {
+                        System.out.println(RED + "Ordem de serviço não encontrada. " + CROSS + RESET);
+                    }
+
+                    break;
+                case 4:
+                    ServiceOrderInterface order = this.client.updateServiceOrder(this.message);
+                    if (order == null) {
+                        System.out.println(RED + "Falha ao atualizar a ordem de serviço. " + CROSS + RESET);
+                        return;
+                    }
+            
+                    System.out.println(GREEN + "Ordem de serviço atualizada com sucesso. " + CHECK + RESET);
+                    break;
+                case 5:
+                    List<ServiceOrderInterface> orders = this.client.listServiceOrders(message);
+
+                    if (orders.isEmpty()) {
+                        System.out.println(RED + "Nenhuma ordem de serviço encontrada. " + CROSS + RESET);
+                    } else {
+                        System.out.println(GREEN + "Listando ordens de serviço:" + RESET);
+                        for (ServiceOrderInterface orderL : orders) {
+                            System.out.println(PURPLE + STAR + " " + orderL + RESET);
+                        }
+                    }
+                    break;
+                case 6:
+                    int ordersCount = this.client.countServiceOrders();
+
+                    if (ordersCount == 0) {
+                        System.out.println(RED + "Nenhuma ordem de serviço encontrada. " + CROSS + RESET);
+                    } else {
+                        System.out.println(GREEN + "Contagem de ordens de serviço: " + ordersCount + RESET);
+                    }
+                    break;
+            }
+        } catch (Exception e) {
+            System.out.println(RED + "Erro ao processar a requisição. tente novamente" + CROSS + RESET);
         }
     }
 }
