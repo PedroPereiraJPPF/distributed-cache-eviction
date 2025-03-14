@@ -8,8 +8,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import Src.Domain.LocalizationServer.RmiMethods.LocalizationInterface;
 import Src.Domain.LocalizationServer.RmiMethods.LocalizationRMI;
 import Src.Domain.Structures.ServerData.ServerData;
@@ -19,7 +17,6 @@ import Utils.Logger;
 // Irá retornar um objeto do tipo ServerData
 public class LocalizationServer {
     public static List<ServerData> proxyList = new ArrayList<ServerData>();
-    public static AtomicInteger currentProxyIndex = new AtomicInteger(0);
 
     private static void startRMI() throws RemoteException {
         LocalizationInterface localizationRMI = new LocalizationRMI();

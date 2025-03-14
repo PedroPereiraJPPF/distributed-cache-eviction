@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
+import java.util.Random;
+
 import Src.Domain.Structures.ServerData.ServerData;
 import Utils.Logger;
 
@@ -26,7 +28,9 @@ class RequestHandler implements Runnable {
             // manda o objeto de servidor para o cliente
             this.output = new ObjectOutputStream(socket.getOutputStream());
 
-            int currentIndex = LocalizationServer.currentProxyIndex.getAndUpdate(i -> (i + 1) % proxyList.size());
+            Random random = new Random();
+
+            int currentIndex = random.nextInt(proxyList.size());
             ServerData loadBalancerData = proxyList.get(currentIndex);
 
             System.out.println("Enviando servidor de IP: " + loadBalancerData.IP + " e porta: " + loadBalancerData.port);

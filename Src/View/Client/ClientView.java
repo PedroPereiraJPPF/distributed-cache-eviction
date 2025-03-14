@@ -2,6 +2,8 @@ package Src.View.Client;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -14,6 +16,8 @@ import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 public class ClientView {
     private Client client;
     private Scanner scanner;
+    private String user = null;
+    private String password = null;
 
     private static final String RESET = "\u001B[0m";
     private static final String RED = "\u001B[31m";
@@ -37,6 +41,7 @@ public class ClientView {
         boolean authenticated = false;
 
         System.out.println("Para inciar é necessario fazer a authenticação");
+
         while (true) {
             System.out.println("Digite 1 para authenticar e 2 para sair");
             String response = this.scanner.nextLine();
@@ -46,12 +51,12 @@ public class ClientView {
             }
 
             System.out.print("Digite seu usuario: ");
-            String user = this.scanner.nextLine();
+            this.user = this.scanner.nextLine();
 
             System.out.print("Digite sua senha: ");
-            String password = this.scanner.nextLine();
+            this.password = this.scanner.nextLine();
 
-            String userData = user + ":" + password;
+            String userData = this.user + ":" + this.password;
 
             authenticated = this.client.authenticate(userData);
 
@@ -109,14 +114,28 @@ public class ClientView {
                 scanner.nextLine();
             } catch (EOFException e) {
                 System.out.println(RED + "A conexão com o servidor foi perdida, reinicie a aplicação e tente novamente em alguns segundos." + RESET);
+                try {
+                    this.client.changeServer();
 
-                authenticated = false;
+                    authenticated = this.client.authenticate(user + ":" + password);
+                } catch (RemoteException | NotBoundException e1) {
+                    System.out.println(RED + "Erro ao se conectar ao servidor de localização. " + CROSS + RESET);
+
+                    authenticated = false;
+                }
             } catch (ClassNotFoundException e) {
                 System.out.println(RED + "Erro ao processar a resposta do servidor. " + CROSS + RESET);
             } catch (IOException e) {
                 System.out.println(RED + "A conexão com o servidor foi perdida, reinicie a aplicação e tente novamente em alguns segundos." + RESET);
+                try {
+                    this.client.changeServer();
 
-                authenticated = false;
+                    authenticated = true;
+                } catch (RemoteException | NotBoundException e1) {
+                    System.out.println(RED + "Erro ao se conectar ao servidor de localização. " + CROSS + RESET);
+
+                    authenticated = false;
+                }
             }
         }
     }

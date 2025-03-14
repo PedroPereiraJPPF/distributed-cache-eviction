@@ -5,12 +5,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import Src.Domain.Client.Interface.ClientInterface;
+import Src.Domain.LocalizationServer.RmiMethods.LocalizationInterface;
 import Src.Domain.Server.Server;
 import Src.Domain.Server.Interface.ServerInterface;
 import Src.Domain.Server.Message.CompressedObject;
@@ -21,6 +26,7 @@ import Src.Domain.Structures.ServiceOrder.ServiceOrder;
 import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 
 public class Client implements ClientInterface {
+    private ServerData localizationServerData;
     private ServerData serverData;
     private ServerInterface server;
     private Socket serverSocket;
@@ -29,7 +35,7 @@ public class Client implements ClientInterface {
     private boolean authenticated; 
 
     public Client() {
-        this.serverData = new ServerData("localhost", 5000);
+        this.localizationServerData = new ServerData("localhost", 5000);
 
         this.connectServer();
     }
@@ -38,7 +44,7 @@ public class Client implements ClientInterface {
     public ServerInterface connectServer() {
         try {
             // conecta com o servidor de localização e pega o endereço do novo
-            this.serverSocket = new Socket(this.serverData.IP, this.serverData.port);
+            this.serverSocket = new Socket(this.localizationServerData.IP, this.localizationServerData.port);
 
             this.input = new ObjectInputStream(this.serverSocket.getInputStream());
 
@@ -50,9 +56,9 @@ public class Client implements ClientInterface {
 
             return this.server;
         } catch (Exception e) {
-            e.printStackTrace();
-
             System.out.println("Erro ao conectar com o servidor");
+
+            System.out.println(e.getMessage());
 
             return null;
         }
@@ -202,6 +208,19 @@ public class Client implements ClientInterface {
 
             return 0;
         }
+    }
+
+    public void changeServer() throws RemoteException, NotBoundException {
+        // Conecta com o rmi do servidor de localização para avisar da falha
+        Registry registry = LocateRegistry.getRegistry("localhost", 4000);
+
+        LocalizationInterface localization = (LocalizationInterface) registry.lookup("localization");
+
+        localization.serverInactive(serverData.IP, serverData.port);
+
+        this.connectServer();
+
+        System.out.println("Novo servidor conectado IP: " + this.serverData.IP + " Port: " + this.serverData.port);
     }
 
     private ServiceOrderInterface messageToServiceOrder(Message message) throws ParseException {

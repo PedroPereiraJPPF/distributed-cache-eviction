@@ -2,6 +2,8 @@ package Src.Domain.Client.Interface;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -21,4 +23,5 @@ public interface ClientInterface {
     public ServiceOrderInterface updateServiceOrder(Message message) throws EOFException, IOException, ClassNotFoundException; 
     public List<ServiceOrderInterface> listServiceOrders(Message message) throws ParseException, EOFException, IOException, ClassNotFoundException;
     public int countServiceOrders() throws EOFException, IOException, ClassNotFoundException;
+    public void changeServer() throws RemoteException, NotBoundException;
 }
