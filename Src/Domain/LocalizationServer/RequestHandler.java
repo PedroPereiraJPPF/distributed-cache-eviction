@@ -3,6 +3,7 @@ package Src.Domain.LocalizationServer;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 import Src.Domain.Structures.ServerData.ServerData;
 import Utils.Logger;
 
@@ -11,12 +12,12 @@ class RequestHandler implements Runnable {
     // instancia do socket e output
     private Socket socket;
     private ObjectOutputStream output;
-    private ServerData loadBalancerData;
+    private List<ServerData> proxyList;
     private Logger logger;
 
-    public RequestHandler(Socket socket, Integer serverPort, String serverIP, Logger logger) {
+    public RequestHandler(Socket socket, List<ServerData> proxyList, Logger logger) {
         this.socket = socket;
-        this.loadBalancerData = new ServerData(serverIP, serverPort);
+        this.proxyList = proxyList;
         this.logger = logger;
     }
 
@@ -25,11 +26,16 @@ class RequestHandler implements Runnable {
             // manda o objeto de servidor para o cliente
             this.output = new ObjectOutputStream(socket.getOutputStream());
 
-            this.output.writeObject(this.loadBalancerData);
+            int currentIndex = LocalizationServer.currentProxyIndex.getAndUpdate(i -> (i + 1) % proxyList.size());
+            ServerData loadBalancerData = proxyList.get(currentIndex);
+
+            System.out.println("Enviando servidor de IP: " + loadBalancerData.IP + " e porta: " + loadBalancerData.port);
+
+            this.output.writeObject(loadBalancerData);
 
             // salva os logs de acesso
             this.logger.info("Acesso cliente de ip: " + this.socket.getInetAddress().getHostAddress());
-            this.logger.info("Solicitou servidor de IP: " + this.loadBalancerData.IP + " e porta: " + this.loadBalancerData.port);
+            this.logger.info("Solicitou servidor de IP: " + loadBalancerData.IP + " e porta: " + loadBalancerData.port);
         } catch (IOException e) {
             e.printStackTrace();
         }

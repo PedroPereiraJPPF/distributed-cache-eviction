@@ -3,16 +3,18 @@ package Src.Domain.Proxy;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Map;
 
 import Database.Cache.Cache;
+import Src.Domain.LocalizationServer.RmiMethods.LocalizationInterface;
 import Src.Domain.Structures.ServiceOrder.ServiceOrder;
 import Utils.Logger;
 
 public class ProxyServer {
-    public static String authName = "admin";
-    public static String password = "123456";
-
     public static final Map<String, String> users = Map.of(
         "user", "123456",
         "user2", "123456",
@@ -25,6 +27,9 @@ public class ProxyServer {
     public static void main(String[] args) {
         final String applicationServerIp = "localhost";
         final int applicationServerPort = 5002;
+        int applicationPort = 5001;
+        boolean active = false;
+        boolean connectedToLocalizationServer = false;
 
         // Faz uma copia dos dados da aplicação para a cache
         fullFillCache();
@@ -32,20 +37,48 @@ public class ProxyServer {
         Logger logger = new Logger("Logs/ProxyLogs.log");
         ServerSocket server = null;
 
-        try {
-            server = new ServerSocket(5001);
-        } catch (IOException e) {
-            e.printStackTrace();
+        while (!active) {
+            try {
+                server = new ServerSocket(applicationPort);
+
+                active = true;
+            } catch (IOException e) {
+                System.out.println("Porta " + applicationPort + " ocupada");
+
+                applicationPort++;
+            }
         }
+
+        System.out.println("Proxy iniciado na porta: " + applicationPort);
+        logger.info("Proxy iniciado na porta: " + applicationPort);
 
         if (server == null) {
             System.out.println("Falha ao iniciar o proxy");
             logger.info("Falha ao iniciar o proxy");
         }
 
-        System.out.println("Proxy iniciado");
-        logger.info("Proxy iniciado");
+        System.out.println("Tentando conectar ao RMI do servidor de localização");
+        logger.info("Tentando conectar ao RMI do servidor de localização");
 
+        while (!connectedToLocalizationServer) {
+            try {
+                setActiveInLocalizationServer(applicationPort);
+
+                connectedToLocalizationServer = true;
+            } catch (RemoteException | NotBoundException e) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e1) {
+                    System.out.println("Erro ao tentar colocar a thread em sleep: " + e1.getMessage());
+                    logger.info("Erro ao tentar colocar a thread em sleep: " + e1.getMessage());    
+                }
+            }
+        }
+
+        System.out.println("Conectado ao servidor de localização");
+        logger.info("Conectado ao servidor de localização");
+
+        System.out.println("Conectado ao servidor de aplicação: " + applicationServerIp + " port: " + applicationServerPort);
         logger.info("Conectado ao servidor de aplicação: " + applicationServerIp + " port: " + applicationServerPort);
 
         while(true) {
@@ -71,6 +104,15 @@ public class ProxyServer {
         if (server != null) {
             logger.info("Servidor fechado");
         }
+    }
+
+    // Informa ao servidor de localização que a conexão foi iniciada
+    private static void setActiveInLocalizationServer(int applicationPort) throws RemoteException, NotBoundException {
+        Registry registry = LocateRegistry.getRegistry("localhost", 4000);
+
+        LocalizationInterface localization = (LocalizationInterface) registry.lookup("localization");
+    
+        localization.registerServer("localhost", applicationPort);
     }
 
     public static void fullFillCache() {
