@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 
 import Src.Domain.LocalizationServer.LocalizationServer;
@@ -24,6 +25,13 @@ public class LocalizationRMI extends UnicastRemoteObject implements Localization
 
         // informa a todos que um novo rmi foi cadastrado
         this.broadcastProxyRMI(RmiData);
+
+        // adiciona o rmi na lista de rmi
+        LocalizationServer.proxyRmiMap.put(serverIP + serverPort, RmiData);
+
+        System.out.println("Item adicionado na lista");
+
+        System.out.println(LocalizationServer.proxyRmiMap.values().size());
     }
 
     @Override
@@ -31,14 +39,22 @@ public class LocalizationRMI extends UnicastRemoteObject implements Localization
         // remove da lista de proxy ativos
         LocalizationServer.proxyList.removeIf(server -> server.IP.equals(serverIP) && server.port.equals(serverPort));
 
+        ServerData rmiData = LocalizationServer.proxyRmiMap.get(serverIP + serverPort);
+
+        LocalizationServer.proxyRmiMap.remove(serverIP + serverPort);
+
         // informa todos para remover um rmi da lista
-        // this.broadcastProxyRMIRemove(RmiData);
+        this.broadcastProxyRMIRemove(rmiData);
+
+        System.out.println("Item removido da lista");
+
+        System.out.println(LocalizationServer.proxyRmiMap.values().size());
     }
 
     @Override
     public void broadcastProxyRMI(ServerData serverData) {
         // manda esse rmi para todos os proxys ativos
-        for (ServerData rmi : LocalizationServer.proxyRmiList) {
+        for (ServerData rmi : LocalizationServer.proxyRmiMap.values()) {
             try {
                 Registry registry = LocateRegistry.getRegistry(rmi.IP, rmi.port);
 
@@ -51,17 +67,12 @@ public class LocalizationRMI extends UnicastRemoteObject implements Localization
                 // todo implementar regra para recuperação de falhas
             }
         }
-
-        LocalizationServer.proxyRmiList.add(serverData);
     }
 
     @Override
     public void broadcastProxyRMIRemove(ServerData serverData) {
-        // remove o proxy da lista de rmi
-        LocalizationServer.proxyRmiList.removeIf(server -> server.IP.equals(serverData.IP) && server.port.equals(serverData.port));
-
         // informa aos servidores de proxy que um rmi deve ser removido da lista
-        for (ServerData rmi : LocalizationServer.proxyRmiList) {
+        for (ServerData rmi : LocalizationServer.proxyRmiMap.values()) {
             try {
                 Registry registry = LocateRegistry.getRegistry(rmi.IP, rmi.port);
 
@@ -78,6 +89,6 @@ public class LocalizationRMI extends UnicastRemoteObject implements Localization
 
     @Override
     public List<ServerData> getCurrentRMIList() {
-        return LocalizationServer.proxyRmiList;
+        return new ArrayList<>(LocalizationServer.proxyRmiMap.values());
     }
 }

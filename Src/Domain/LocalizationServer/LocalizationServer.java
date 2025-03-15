@@ -7,7 +7,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import Src.Domain.LocalizationServer.RmiMethods.LocalizationInterface;
 import Src.Domain.LocalizationServer.RmiMethods.LocalizationRMI;
 import Src.Domain.Structures.ServerData.ServerData;
@@ -17,7 +20,7 @@ import Utils.Logger;
 // Irá retornar um objeto do tipo ServerData
 public class LocalizationServer {
     public static List<ServerData> proxyList = new ArrayList<>();
-    public static List<ServerData> proxyRmiList = new ArrayList<>();
+    public static Map<String, ServerData> proxyRmiMap = new HashMap<>(); 
  
     private static void startRMI() throws RemoteException {
         LocalizationInterface localizationRMI = new LocalizationRMI();
