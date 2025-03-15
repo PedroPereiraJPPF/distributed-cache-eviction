@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 import Src.Domain.LocalizationServer.LocalizationServer;
 import Src.Domain.Proxy.RmiMethods.ProxyRmiInterface;
@@ -73,5 +74,10 @@ public class LocalizationRMI extends UnicastRemoteObject implements Localization
                 // todo implementar regra para recuperação de falhas
             }
         }
+    }
+
+    @Override
+    public List<ServerData> getCurrentRMIList() {
+        return LocalizationServer.proxyRmiList;
     }
 }

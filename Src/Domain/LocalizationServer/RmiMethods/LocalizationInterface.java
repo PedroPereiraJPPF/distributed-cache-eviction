@@ -2,6 +2,7 @@ package Src.Domain.LocalizationServer.RmiMethods;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import Src.Domain.Structures.ServerData.ServerData;
 
@@ -12,4 +13,6 @@ public interface LocalizationInterface extends Remote {
     public void broadcastProxyRMI(ServerData serverData) throws RemoteException;
     // Serve para remover um rmi da lista e avisar os proxy que ele foi removido
     public void broadcastProxyRMIRemove(ServerData serverData) throws RemoteException;
+    // Serve para pegar a lista de rmi dos proxy
+    public List<ServerData> getCurrentRMIList() throws RemoteException;
 }

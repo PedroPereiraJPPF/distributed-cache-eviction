@@ -120,6 +120,7 @@ public class RequestHandler implements Runnable {
                     
                     try {
                         stub = (ProxyRmiInterface) registry.lookup("proxy");
+                        
                         stub.removeCacheItem();
                     } catch (NotBoundException e) {
                         System.out.println("falha ao informar a mensagem ao proxy");

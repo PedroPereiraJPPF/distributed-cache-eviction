@@ -150,6 +150,8 @@ public class ProxyServer {
         Registry registry = LocateRegistry.getRegistry(applicationIp, 4000);
 
         LocalizationInterface localization = (LocalizationInterface) registry.lookup("localization");
+
+        rmiList = localization.getCurrentRMIList();    
     
         localization.registerServer(applicationIp, applicationPort, rmiData);
     }
