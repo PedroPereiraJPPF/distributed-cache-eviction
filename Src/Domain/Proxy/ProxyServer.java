@@ -1,5 +1,6 @@
 package Src.Domain.Proxy;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -12,7 +13,6 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import Database.Cache.Cache;
 import Src.Domain.LocalizationServer.RmiMethods.LocalizationInterface;
 import Src.Domain.Proxy.RmiMethods.ProxyRmi;
@@ -48,7 +48,17 @@ public class ProxyServer {
         // Faz uma copia dos dados da aplicação para a cache
         fullFillCache();
 
-        Logger logger = new Logger("Logs/ProxyLogs.log");
+        // conta os logs que existem
+        String logDirectory = "Logs";
+        File dir = new File(logDirectory);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        int count = dir.list().length + 1;
+
+        Logger logger = new Logger("Logs/ProxyLogs_" + count + ".log");
+
         ServerSocket server = null;
 
         while (!active) {
@@ -57,8 +67,6 @@ public class ProxyServer {
 
                 active = true;
             } catch (IOException e) {
-                System.out.println("Porta " + applicationPort + " ocupada");
-
                 applicationPort++;
             }
         }

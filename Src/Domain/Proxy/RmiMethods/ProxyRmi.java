@@ -4,6 +4,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import Src.Domain.Proxy.ProxyServer;
 import Src.Domain.Structures.ServerData.ServerData;
+import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 
 import java.rmi.RemoteException;
 
@@ -26,12 +27,14 @@ public class ProxyRmi extends UnicastRemoteObject implements ProxyRmiInterface {
 
     // metodos para comunicação entre proxy
 	@Override
-	public void removeCacheItem() throws RemoteException {
-		System.out.println("deu certo vir ate aqui");
+	public void removeCacheItem(ServiceOrderInterface serviceOrder) throws RemoteException {
+		ProxyServer.cache.delete(serviceOrder);
 	}
 
     @Override
-	public void updateCacheItem() throws RemoteException {
-		// Implementation here
+	public void updateCacheItem(ServiceOrderInterface serviceOrder) throws RemoteException {
+		ProxyServer.cache.delete(serviceOrder);
+
+		ProxyServer.cache.insert(serviceOrder);
 	}
 }

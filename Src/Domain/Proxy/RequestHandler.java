@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
-
 import Src.Domain.Proxy.RmiMethods.ProxyRmiInterface;
 import Src.Domain.Server.Message.CompressedObject;
 import Src.Domain.Server.Message.CompressionManager;
@@ -23,6 +22,7 @@ import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 import Utils.Logger;
 
 public class RequestHandler implements Runnable {
+    private String userName;
     private Socket client;
     private Socket server;
     private Logger logger;
@@ -84,7 +84,9 @@ public class RequestHandler implements Runnable {
                 return;
             }
 
-            String password = users.get(userData[0]);
+            this.userName = userData[0];
+
+            String password = users.get(this.userName);
 
             if (password == null || !password.equals(userData[1])) {
                 logger.info("Usuario: " + this.client.getInetAddress().getHostAddress() + " não reconhecido");
@@ -112,20 +114,10 @@ public class RequestHandler implements Runnable {
                 // recebe a mensagem do cliente e reenvia para o servidor
                 Object clientMessage = this.inputClient.readObject();
 
-                this.logger.info("Mensagem recebida IP: " + this.client.getInetAddress().getHostAddress());
-
-                for (ServerData data : ProxyServer.rmiList) {
-                    Registry registry = LocateRegistry.getRegistry(data.IP, data.port);
-                    ProxyRmiInterface stub;
-                    
-                    try {
-                        stub = (ProxyRmiInterface) registry.lookup("proxy");
-                        
-                        stub.removeCacheItem();
-                    } catch (NotBoundException e) {
-                        System.out.println("falha ao informar a mensagem ao proxy");
-                    }
-                }
+                this.logger.info("\n============================================ \n" +
+                                 " Mensagem recebida do cliente de IP: " + this.client.getInetAddress().getHostAddress() +
+                                 "\n Usuario: " + this.userName + 
+                                 "\n============================================ ");
 
                 Message convertedMessage = (Message) clientMessage;
 
@@ -162,6 +154,19 @@ public class RequestHandler implements Runnable {
 
                             this.logger.info("Item removido da cache");
                         }
+
+                        for (ServerData data : ProxyServer.rmiList) {
+                            Registry registry = LocateRegistry.getRegistry(data.IP, data.port);
+
+                            try {
+                                ProxyRmiInterface proxyRmi = (ProxyRmiInterface) registry.lookup("proxy");
+
+                                proxyRmi.removeCacheItem(serviceOrder);
+                            } catch (NotBoundException e) {
+                                System.out.println("Falha ao informar um proxy que um item foi deletado, dados rmi Ip: " + data.IP + " Port: " + data.port);
+                                this.logger.error("Falha ao informar um proxy que um item foi deletado, dados rmi Ip: " + data.IP + " Port: " + data.port);
+                            }                            
+                        }
                     }
                 }
 
@@ -197,6 +202,19 @@ public class RequestHandler implements Runnable {
                                 ProxyServer.cache.delete(so);
 
                                 ProxyServer.cache.insert(so);
+
+                                for (ServerData data : ProxyServer.rmiList) {
+                                    Registry registry = LocateRegistry.getRegistry(data.IP, data.port);
+        
+                                    try {
+                                        ProxyRmiInterface proxyRmi = (ProxyRmiInterface) registry.lookup("proxy");
+        
+                                        proxyRmi.updateCacheItem(so);
+                                    } catch (NotBoundException e) {
+                                        System.out.println("Falha ao informar um proxy que um item foi atualizado, dados rmi Ip: " + data.IP + " Port: " + data.port);
+                                        this.logger.error("Falha ao informar um proxy que um item foi atualizado, dados rmi Ip: " + data.IP + " Port: " + data.port);
+                                    }                            
+                                }
                             }
                         }
                     }

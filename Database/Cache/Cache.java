@@ -1,5 +1,6 @@
 package Database.Cache;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -16,14 +17,14 @@ public class Cache {
         this.queue = new LinkedList<ServiceOrderInterface>();
         this.size = 0;
         this.maxSize = 20;
-        this.logger = new Logger("Logs/CacheLogs.log");
+        this.logger = new Logger("Logs/CacheLogs" +countLogs()+ " .log");
     }
 
     public Cache(int maxSize) {
         this.queue = new LinkedList<ServiceOrderInterface>();
         this.size = 0;
         this.maxSize = maxSize;
-        this.logger = new Logger("Logs/CacheLogs.log");
+        this.logger = new Logger("Logs/CacheLogs" +countLogs()+ " .log");
     }
 
     public ServiceOrderInterface insert(ServiceOrderInterface value) {
@@ -106,5 +107,15 @@ public class Cache {
     public void clear() {
         this.queue.clear();
         this.size = 0;
+    }
+
+    private int countLogs() {
+        String logDirectory = "Logs";
+        File dir = new File(logDirectory);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        return dir.list().length + 1;
     }
 }
