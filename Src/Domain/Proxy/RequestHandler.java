@@ -4,15 +4,20 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.rmi.NotBoundException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
+import Src.Domain.Proxy.RmiMethods.ProxyRmiInterface;
 import Src.Domain.Server.Message.CompressedObject;
 import Src.Domain.Server.Message.CompressionManager;
 import Src.Domain.Server.Message.Message;
+import Src.Domain.Structures.ServerData.ServerData;
 import Src.Domain.Structures.ServiceOrder.ServiceOrder;
 import Src.Domain.Structures.ServiceOrder.ServiceOrderInterface;
 import Utils.Logger;
@@ -108,6 +113,18 @@ public class RequestHandler implements Runnable {
                 Object clientMessage = this.inputClient.readObject();
 
                 this.logger.info("Mensagem recebida IP: " + this.client.getInetAddress().getHostAddress());
+
+                for (ServerData data : ProxyServer.rmiList) {
+                    Registry registry = LocateRegistry.getRegistry(data.IP, data.port);
+                    ProxyRmiInterface stub;
+                    
+                    try {
+                        stub = (ProxyRmiInterface) registry.lookup("proxy");
+                        stub.removeCacheItem();
+                    } catch (NotBoundException e) {
+                        System.out.println("falha ao informar a mensagem ao proxy");
+                    }
+                }
 
                 Message convertedMessage = (Message) clientMessage;
 

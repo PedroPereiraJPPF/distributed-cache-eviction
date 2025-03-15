@@ -16,8 +16,9 @@ import Utils.Logger;
 // Este servidor será responsavel por receber a primeira conexão do cliente e enviar o endereço do proxy
 // Irá retornar um objeto do tipo ServerData
 public class LocalizationServer {
-    public static List<ServerData> proxyList = new ArrayList<ServerData>();
-
+    public static List<ServerData> proxyList = new ArrayList<>();
+    public static List<ServerData> proxyRmiList = new ArrayList<>();
+ 
     private static void startRMI() throws RemoteException {
         LocalizationInterface localizationRMI = new LocalizationRMI();
 
