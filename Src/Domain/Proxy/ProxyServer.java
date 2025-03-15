@@ -71,9 +71,6 @@ public class ProxyServer {
             logger.info("Falha ao iniciar o proxy");
         }
 
-        System.out.println("Iniciando rmi do proxy");
-        logger.info("Iniciando rmi do proxy");
-
         // inicia o rmi do servidor 
         while (!rmiActive) {
             try {
@@ -81,10 +78,7 @@ public class ProxyServer {
                 registry.rebind("proxy", new ProxyRmi());
                 rmiActive = true;
 
-                System.out.println("RMI iniciado na porta: " + rmiPort);
             } catch (RemoteException e) {
-                System.out.println("Porta " + rmiPort + " já está em uso. Tentando próxima porta...");
-
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e1) {
@@ -95,9 +89,6 @@ public class ProxyServer {
                 rmiPort++;
             }
         }
-
-        System.out.println("Tentando conectar ao RMI do servidor de localização");
-        logger.info("Tentando conectar ao RMI do servidor de localização");
 
         while (!connectedToLocalizationServer) {
             try {
@@ -119,6 +110,9 @@ public class ProxyServer {
 
         System.out.println("Conectado ao servidor de aplicação: " + applicationServerIp + " port: " + applicationServerPort);
         logger.info("Conectado ao servidor de aplicação: " + applicationServerIp + " port: " + applicationServerPort);
+
+        System.out.println("RMI iniciado na porta: " + rmiPort);
+        logger.info("RMI iniciado na porta: " + rmiPort);
 
         while(true) {
             try {
