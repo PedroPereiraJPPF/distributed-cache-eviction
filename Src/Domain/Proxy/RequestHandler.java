@@ -128,7 +128,54 @@ public class RequestHandler implements Runnable {
 
                     ServiceOrderInterface value = ProxyServer.cache.find(serviceOrder.getCode());
 
-                    if (value != null) {
+                    // caso o item não esta na cache é feito a busca em outros proxies
+                    if (value == null) {
+                        boolean itemFoundInOtherProxy = false;
+
+                        for (ServerData data : ProxyServer.rmiList) {
+                            Registry registry = LocateRegistry.getRegistry(data.IP, data.port);
+
+                            try {
+                                ProxyRmiInterface proxyRmi = (ProxyRmiInterface) registry.lookup("proxy");
+
+                                ServiceOrderInterface order = proxyRmi.getServiceOrder(serviceOrder);
+
+                                if (order != null) {
+                                    value = order;
+
+                                    synchronized (ProxyServer.cache) {
+                                        this.logger.info("\n============================================" +
+                                                         "\n O item estava na cache do proxy com o proxy de IP: " + data.IP +
+                                                         "\n Adiciona novo item na cache codigo: " + order.getCode() +
+                                                         "\n============================================ ");
+
+                                        ProxyServer.cache.insert(order);
+                                    }
+
+                                    itemFoundInOtherProxy = true;
+
+                                    break;
+                                }
+                            } catch (NotBoundException e) {
+                                System.out.println("Falha ao informar um proxy que um item foi deletado, dados rmi Ip: " + data.IP + " Port: " + data.port);
+                                this.logger.error("Falha ao informar um proxy que um item foi deletado, dados rmi Ip: " + data.IP + " Port: " + data.port);
+                            }                            
+                        }
+
+                        // envia a mensagem para o cliente caso encontre em algum cache
+                        if (itemFoundInOtherProxy) {
+                            this.outputClient.writeObject(new Message(
+                                value.getCode(),
+                                value.getName(),
+                                value.getDescription(),
+                                value.getRequestTime()
+                            ));
+
+                            this.logger.info("Mensagem do cache enviada para o cliente de ip: " + this.client.getInetAddress().getHostAddress());
+
+                            continue;
+                        }
+                    } else {
                         this.logger.info("O valor buscado estava na cache o codigo é: " + value.getCode());
 
                         this.outputClient.writeObject(new Message(

@@ -13,4 +13,5 @@ public interface ProxyRmiInterface extends Remote {
     // Esses metodos são para comunicação entre os proxy
     public void updateCacheItem(ServiceOrderInterface serviceOrder) throws RemoteException;
     public void removeCacheItem(ServiceOrderInterface serviceOrder) throws RemoteException;
+    public ServiceOrderInterface getServiceOrder(ServiceOrderInterface serviceOrder) throws RemoteException;
 }

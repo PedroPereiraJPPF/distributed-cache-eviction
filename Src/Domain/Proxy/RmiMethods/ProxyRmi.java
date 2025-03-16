@@ -37,4 +37,9 @@ public class ProxyRmi extends UnicastRemoteObject implements ProxyRmiInterface {
 
 		ProxyServer.cache.insert(serviceOrder);
 	}
+
+	@Override
+	public ServiceOrderInterface getServiceOrder(ServiceOrderInterface serviceOrder) throws RemoteException {
+		return ProxyServer.cache.find(serviceOrder.getCode());
+	}
 }
