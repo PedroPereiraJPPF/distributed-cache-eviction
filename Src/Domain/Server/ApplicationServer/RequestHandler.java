@@ -46,6 +46,8 @@ public class RequestHandler implements Runnable {
 
                 this.logger.info("Mensagem recebida do cliente: " + this.client.getInetAddress().getHostAddress());
                 this.logger.info("Operação: " + message.getOperation());
+                this.stub.synchronizeLogs("Mensagem recebida do cliente: " + this.client.getInetAddress().getHostAddress(), "info");
+                this.stub.synchronizeLogs("Operação: " + message.getOperation(), "info");
 
                 switch (message.getOperation()) {
                     case "get":
@@ -53,6 +55,7 @@ public class RequestHandler implements Runnable {
                         getResponse.setOperation("update-cache:get");
 
                         this.logger.info("Novo dado solicitado pelo cliente: " + this.client.getInetAddress().getHostAddress());
+                        this.stub.synchronizeLogs("Novo dado solicitado pelo cliente: " + this.client.getInetAddress().getHostAddress(), "info");
 
                         this.clientOutput.writeObject(getResponse);
                         break;
@@ -84,8 +87,8 @@ public class RequestHandler implements Runnable {
                             this.logger.info("Ordem de serviço deletada");
                             this.stub.synchronizeLogs("Ordem de serviço deletada", "info");
                         } else {
-                            this.logger.info("Falha ao deletar ordem de serviço");
-                            this.stub.synchronizeLogs("Falha ao deletar ordem de serviço", "info");
+                            this.logger.warning("Falha ao deletar ordem de serviço");
+                            this.stub.synchronizeLogs("Falha ao deletar ordem de serviço", "warning");
                         }
 
                         this.stub.removeServiceOrder(message);
