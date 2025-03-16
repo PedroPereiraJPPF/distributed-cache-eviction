@@ -12,12 +12,20 @@ public class HashDatabase implements Serializable {
     private int capacity;
     private int size;
     private CustomLinkedList[] table;
-    private Logger logger = new Logger("Logs/DatabaseLogs.log");
+    private Logger logger = null;
     
     public HashDatabase() {
         this.capacity = 20;
         this.size = 0;
         this.table = new CustomLinkedList[capacity];
+        this.logger =  new Logger("Logs/DatabaseLogs.log");
+    }
+
+    public HashDatabase(String loggerPath) {
+        this.capacity = 20;
+        this.size = 0;
+        this.table = new CustomLinkedList[capacity];
+        this.logger = new Logger(loggerPath);
     }
 
     public ServiceOrderInterface insert(ServiceOrderInterface order) {

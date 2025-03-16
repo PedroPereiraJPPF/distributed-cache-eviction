@@ -36,7 +36,7 @@ public class ProxyServer {
 
     public static void main(String[] args) throws UnknownHostException {
         final String applicationServerIp = "localhost";
-        final int applicationServerPort = 5002;        
+        final int applicationServerPort = 2345;        
         int rmiPort = 1233;
         int applicationPort = 5001;
         boolean active = false;

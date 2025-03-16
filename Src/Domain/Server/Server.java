@@ -26,6 +26,18 @@ public class Server implements ServerInterface {
         }
     }
 
+    public Server(String databaseLoggerPath) {
+        this.database = new HashDatabase(databaseLoggerPath);
+
+        for (int i = 1; i <= 70; i++) {
+            ServiceOrder serviceOrder = new ServiceOrder();
+            serviceOrder.setName("Ordem de Serviço " + i);
+            serviceOrder.setDescription("Descrição da Ordem de Serviço " + i);
+
+            this.storeServiceOrder(serviceOrder);
+        }
+    }
+
     @Override
     public List<Message> listServiceOrders() {
         List<ServiceOrderInterface> orders = this.database.list();

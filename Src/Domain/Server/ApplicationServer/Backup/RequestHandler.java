@@ -1,15 +1,13 @@
-package Src.Domain.Server.ApplicationServer;
+package Src.Domain.Server.ApplicationServer.Backup;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.rmi.RemoteException;
 import java.util.List;
 
 import Src.Domain.Server.Server;
-import Src.Domain.Server.ApplicationServer.Backup.RmiMethods.BackupRmiInterface;
 import Src.Domain.Server.Message.Message;
 import Utils.Logger;
 
@@ -19,13 +17,11 @@ public class RequestHandler implements Runnable {
     private Server serverCore;
     private ObjectOutputStream clientOutput;
     private ObjectInputStream clientInput;
-    private BackupRmiInterface stub;
     
-    public RequestHandler(Socket client, Server server, Logger logger, BackupRmiInterface stub) throws IOException {
+    public RequestHandler(Socket client, Server server, Logger logger) throws IOException {
         this.logger = logger;
         this.serverCore = server;
         this.client = client;
-        this.stub = stub;
 
         try {
             this.clientInput = new ObjectInputStream(this.client.getInputStream());
@@ -54,41 +50,28 @@ public class RequestHandler implements Runnable {
 
                         this.logger.info("Novo dado solicitado pelo cliente: " + this.client.getInetAddress().getHostAddress());
 
-                        this.clientOutput.writeObject(getResponse);
                         break;
                     case "store":
-                        Message storeResponse = this.serverCore.storeServiceOrder(message);
+                        this.serverCore.storeServiceOrder(message);
 
                         this.logger.info("Novo dado salvo no banco pelo cliente: " + this.client.getInetAddress().getHostAddress());
-                        this.stub.synchronizeLogs("Novo dado salvo no banco pelo cliente: " + this.client.getInetAddress().getHostAddress(), "info");
 
-                        this.stub.addServiceOrder(message);
-
-                        this.clientOutput.writeObject(storeResponse);
                         break;
                     case "update":
                         Message updateResponse = this.serverCore.updateServiceOrder(message);
                         updateResponse.setOperation("update-cache:update");
 
                         this.logger.info("Dado atualizado pelo cliente: " + this.client.getInetAddress().getHostAddress());
-                        this.stub.synchronizeLogs("Dado atualizado pelo cliente: " + this.client.getInetAddress().getHostAddress(), "info");
 
-                        this.stub.updateServiceOrder(message);
-
-                        this.clientOutput.writeObject(updateResponse);
                         break;
                     case "delete":
                         boolean deleteResponse = this.serverCore.deleteServiceOrder(message);
 
                         if (deleteResponse) {
                             this.logger.info("Ordem de serviço deletada");
-                            this.stub.synchronizeLogs("Ordem de serviço deletada", "info");
                         } else {
                             this.logger.info("Falha ao deletar ordem de serviço");
-                            this.stub.synchronizeLogs("Falha ao deletar ordem de serviço", "info");
                         }
-
-                        this.stub.removeServiceOrder(message);
 
                         this.clientOutput.writeObject(deleteResponse);
 
@@ -99,7 +82,7 @@ public class RequestHandler implements Runnable {
                         this.clientOutput.writeObject(listResponse);
 
                         this.logger.info("Listagem retornada para o cliente: " + this.client.getInetAddress().getHostAddress());
-                        this.stub.synchronizeLogs("Listagem retornada para o cliente: " + this.client.getInetAddress().getHostAddress(), "info");
+                        
                         break;
                     default:
                         break;
@@ -109,15 +92,8 @@ public class RequestHandler implements Runnable {
             } catch (EOFException e) {
                 e.printStackTrace();
 
-                this.logger.error("Conexão com servidor de proxy perdida");
+                this.logger.error("Conexão com servidor perdida");
                 this.logger.error("Encerrando conexão");
-
-                try {
-                    this.stub.synchronizeLogs("Conexão com servidor de proxy perdida", "error");
-                    this.stub.synchronizeLogs("Encerrando conexão", "error");
-                } catch (RemoteException e1) {
-                   this.logger.error("Falha ao sincronizar os logs no backup");
-                }
 
                 break;
             } catch (ClassNotFoundException | IOException e) {
@@ -125,13 +101,6 @@ public class RequestHandler implements Runnable {
 
                 this.logger.error("Erro ao receber dados do cliente");
                 this.logger.error(e.getMessage());
-
-                try {
-                    this.stub.synchronizeLogs("Erro ao receber dados do cliente", "error");
-                    this.stub.synchronizeLogs(e.getMessage(), "error");
-                } catch (RemoteException e1) {
-                   this.logger.error("Falha ao sincronizar os logs no backup");
-                }
             }
         }
     }
