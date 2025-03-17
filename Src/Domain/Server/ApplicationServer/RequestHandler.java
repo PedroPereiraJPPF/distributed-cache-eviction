@@ -52,7 +52,9 @@ public class RequestHandler implements Runnable {
                 switch (message.getOperation()) {
                     case "get":
                         Message getResponse = this.serverCore.getServiceOrder(message);
-                        getResponse.setOperation("update-cache:get");
+
+                        if (getResponse != null)
+                            getResponse.setOperation("update-cache:get");
 
                         this.logger.info("Novo dado solicitado pelo cliente: " + this.client.getInetAddress().getHostAddress());
                         this.stub.synchronizeLogs("Novo dado solicitado pelo cliente: " + this.client.getInetAddress().getHostAddress(), "info");
