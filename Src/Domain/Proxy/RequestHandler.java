@@ -242,7 +242,7 @@ public class RequestHandler implements Runnable {
 
                                 ProxyServer.cache.insert(so);
                             }
-                        } else if (operationParts[1].equals("update")) {
+                        } else if (operationParts[1].equals("update") && ProxyServer.cache.find(so.getCode()) != null) {
                             synchronized (ProxyServer.cache) {
                                 this.logger.info("Atualiza um item da cache");
 
