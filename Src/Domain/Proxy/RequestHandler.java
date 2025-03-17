@@ -240,6 +240,8 @@ public class RequestHandler implements Runnable {
                             synchronized (ProxyServer.cache) {
                                 this.logger.info("Adiciona novo item na cache");
 
+                                ProxyServer.cache.delete(so);
+
                                 ProxyServer.cache.insert(so);
                             }
                         } else if (operationParts[1].equals("update") && ProxyServer.cache.find(so.getCode()) != null) {
