@@ -34,16 +34,18 @@ public class ProxyServer {
     // isso vai servir para que esse proxy possa se comunicar com todos os outros
     public static List<ServerData> rmiList = new ArrayList<>();
 
+    final static String localizationIp = "localhost";
+
     public static void main(String[] args) throws UnknownHostException {
         final String applicationServerIp = "localhost";
         final int applicationServerPort = 2345;        
         int rmiPort = 1233;
-        int applicationPort = 5001;
         boolean active = false;
         boolean connectedToLocalizationServer = false;
         boolean rmiActive = false;
         Registry registry = null;
         String applicationIp = InetAddress.getLocalHost().getHostAddress();
+        int applicationPort = 5001;
 
         // Faz uma copia dos dados da aplicação para a cache
         fullFillCache();
@@ -149,7 +151,7 @@ public class ProxyServer {
 
     // Informa ao servidor de localização que a conexão foi iniciada
     private static void setActiveInLocalizationServer(String applicationIp, int applicationPort, ServerData rmiData) throws RemoteException, NotBoundException {
-        Registry registry = LocateRegistry.getRegistry(applicationIp, 4000);
+        Registry registry = LocateRegistry.getRegistry(localizationIp, 4000);
 
         LocalizationInterface localization = (LocalizationInterface) registry.lookup("localization");
 
