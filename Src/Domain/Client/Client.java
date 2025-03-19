@@ -35,7 +35,7 @@ public class Client implements ClientInterface {
     private boolean authenticated; 
 
     public Client() {
-        this.localizationServerData = new ServerData("localhost", 5000);
+        this.localizationServerData = new ServerData("10.10.70.78", 5000);
 
         this.connectServer();
     }
@@ -212,7 +212,7 @@ public class Client implements ClientInterface {
 
     public void changeServer() throws RemoteException, NotBoundException {
         // Conecta com o rmi do servidor de localização para avisar da falha
-        Registry registry = LocateRegistry.getRegistry("localhost", 4000);
+        Registry registry = LocateRegistry.getRegistry("10.10.70.78", 4000);
 
         LocalizationInterface localization = (LocalizationInterface) registry.lookup("localization");
 
@@ -229,11 +229,7 @@ public class Client implements ClientInterface {
         serviceOrder.setCode(code);
         serviceOrder.setName(CompressionManager.decodeParameter(data.getValues()[1], data.getFrequencyTable()));
         serviceOrder.setDescription(CompressionManager.decodeParameter(data.getValues()[2], data.getFrequencyTable()));
-        
-        String decodedRequestTime = CompressionManager.decodeParameter(data.getValues()[3], data.getFrequencyTable());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-        Date requestTime = dateFormat.parse(decodedRequestTime);
-        serviceOrder.setRequestTime(requestTime);
+        serviceOrder.setRequestTime(new Date());
 
         return serviceOrder;
     }

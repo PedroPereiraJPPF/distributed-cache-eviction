@@ -314,12 +314,7 @@ public class RequestHandler implements Runnable {
             serviceOrder.setDescription(CompressionManager.decodeParameter(data.getValues()[2], data.getFrequencyTable()));
         }
 
-        if (data.getValues()[3] != null) {
-            String decodedRequestTime = CompressionManager.decodeParameter(data.getValues()[3], data.getFrequencyTable());
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-            Date requestTime = dateFormat.parse(decodedRequestTime);
-            serviceOrder.setRequestTime(requestTime);
-        }
+        serviceOrder.setRequestTime(new Date());
 
         return serviceOrder;
     }
